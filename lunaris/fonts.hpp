@@ -64,6 +64,9 @@ namespace lunaris {
                     pos_y += line_height;
                 };
 
+                if(buffer_height<=pos_y) return; // If potantial-area finished, return. Cannot write buffer
+                if(buffer_width<=pos_x) continue; // Exceed width, skip until new line
+
                 // https://en.wikipedia.org/wiki/UTF-8
                 if((text[i]&0x80) == 0){ // 1 char unicode (a)
                     the_glyph = text[i];
@@ -97,11 +100,20 @@ namespace lunaris {
                 int bitmap_h = 0;
 
                 unsigned char* the_char = stbtt_GetGlyphBitmapSubpixel(&this->info, scale, scale, 0.0f, 0.0f, stbtt_FindGlyphIndex(&info, the_glyph), &bitmap_w, &bitmap_h, 0, 0);
+                int bitmap_stride = bitmap_w;
                 
+                if(buffer_height<=bitmap_h+char_y){
+                    printf("%d|%d\n", bitmap_h, buffer_height-char_y);
+                    bitmap_h = buffer_height-char_y;
+                };
+                if(buffer_width<=pos_x+bitmap_w){
+                    bitmap_w = buffer_width-pos_x;
+                };
+
                 for(int bitmap_y=0; bitmap_y<bitmap_h; bitmap_y++){
                     for(int bitmap_x=0; bitmap_x<bitmap_w; bitmap_x++){
                         int target_byte = (bitmap_y+char_y)*buffer_width + bitmap_x + left_side_bearing + pos_x;
-                        buffer[target_byte] = color_mix(buffer[target_byte], color, (float)the_char[bitmap_w*bitmap_y + bitmap_x]/(float)255);
+                        buffer[target_byte] = color_mix(buffer[target_byte], color, (float)the_char[bitmap_stride*bitmap_y + bitmap_x]/(float)255);
                     };
                 };
                 free(the_char);
