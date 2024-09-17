@@ -1,0 +1,9 @@
+*.o
+*.exe
+*.out
+# Examples is not ready, most of drafts
+examples
+# The backends is not ready
+lunaris/haiku.hpp
+lunaris/x11.hpp
+lunaris/windows.hpp
