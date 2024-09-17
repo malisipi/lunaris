@@ -103,7 +103,6 @@ namespace lunaris {
                 int bitmap_stride = bitmap_w;
                 
                 if(buffer_height<=bitmap_h+char_y){
-                    printf("%d|%d\n", bitmap_h, buffer_height-char_y);
                     bitmap_h = buffer_height-char_y;
                 };
                 if(buffer_width<=pos_x+bitmap_w){
