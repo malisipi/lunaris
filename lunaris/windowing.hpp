@@ -388,6 +388,9 @@ namespace lunaris {
             void text(int x, int y, int line_height, const char* text, uint32_t color){
                 this->font->draw_text(outer->buffer, outer->width, outer->height, x, y, line_height, text, color);
             };
+            std::pair<int, int> text_bounding_area(int line_height, const char* text){
+                return this->font->bounding_area(line_height, text);
+            };
             void image(lunaris::layer* img, int x, int y, int width, int height){ // TODO: Add options to flip image and background transparency (skipping editting for transparent pixels like <127 alpha)
                 if(img == NULL) return;
                 // TODO: Also add clipping some region and draw it to buffer support
