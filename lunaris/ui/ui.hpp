@@ -92,6 +92,117 @@ namespace lunaris::ui {
         };
     };
 
+    const uint32_t scrollbar_id = request_new_id();
+    typedef struct scrollbar:widget {
+        virtual uint32_t get_type(){
+            return scrollbar_id;
+        };
+        int max = 1;
+        int view = 1;
+        int value = 0;
+        float clicked_pos = 0;
+        int clicked_value = 0;
+        bool is_clicked = false;
+        bool horizontal = false;
+        void draw(lunaris::window* win, uint32_t* buffer){
+            if(this->view < this->max){
+                if(!this->horizontal){ // vertical
+                    win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFF888888);
+                    win->graphics.rect(this->fx, this->fy, this->fw, 16, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx, this->fy+18, this->fw, this->fh-36, 0xFFCCCCCC);
+                    float size = (float)(this->fh-36)/(float)(this->max);
+                    win->graphics.rect(this->fx, this->fy+18+size*this->value, this->fw, size*this->view, 0xFFDDDDDD);
+                    win->graphics.rect(this->fx, this->fy+this->fh-16, this->fw, 16, 0xFFCCCCCC);
+                } else { // horizontal
+                    win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFF888888);
+                    win->graphics.rect(this->fx, this->fy, 16, this->fh, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx+18, this->fy, this->fw-36, this->fh, 0xFFCCCCCC);
+                    float size = (float)(this->fw-36)/(float)(this->max);
+                    win->graphics.rect(this->fx+18+size*this->value, this->fy, size*this->view, this->fh, 0xFFDDDDDD);
+                    win->graphics.rect(this->fx+this->fw-16, this->fy, 16, this->fh, 0xFFCCCCCC);
+                };
+            };
+        };
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+            if(!this->horizontal){ // vertical
+                if(pressed){
+                    int area = this->max-this->view;
+                    if(y<18){
+                        _scroll_up:
+                        if(this->value>0){
+                            this->value--;
+                        };
+                    } else if(y>this->fh-18) {
+                        _scroll_down:
+                        if(area>this->value){
+                            this->value++;
+                        };
+                    } else {
+                        float size = (float)(this->fh-36)/(float)(this->max);
+                        if(y<18+size*this->value) goto _scroll_up;
+                        if(y>18+size*this->value+size*this->view) goto _scroll_down;
+                        this->clicked_pos = y;
+                        this->is_clicked = true;
+                        this->clicked_value = this->value;
+                    };
+                } else {
+                    if(this->is_clicked){
+                        float size = (float)(this->fh-36)/(float)(this->max);
+                        this->value = this->clicked_value + (int)((y-this->clicked_pos)/size);
+                        if(this->value<0) this->value = 0;
+                        else if(this->value>this->max-this->view) this->value = this->max-this->view;
+                        if(!pressed && event != lunaris::mouse::motion){
+                            this->is_clicked = false;
+                        };
+                    };
+                };
+            } else { // horizontal
+                if(pressed){
+                    int area = this->max-this->view;
+                    if(x<18){
+                        _scroll_left:
+                        if(this->value>0){
+                            this->value--;
+                        };
+                    } else if(x>this->fw-18) {
+                        _scroll_right:
+                        if(area>this->value){
+                            this->value++;
+                        };
+                    } else {
+                        float size = (float)(this->fw-36)/(float)(this->max);
+                        if(x<18+size*this->value) goto _scroll_left;
+                        if(x>18+size*this->value+size*this->view) goto _scroll_right;
+                        this->clicked_pos = x;
+                        this->is_clicked = true;
+                        this->clicked_value = this->value;
+                    };
+                } else {
+                    if(this->is_clicked){
+                        float size = (float)(this->fw-36)/(float)(this->max);
+                        this->value = this->clicked_value + (int)((x-this->clicked_pos)/size);
+                        if(this->value<0) this->value = 0;
+                        else if(this->value>this->max-this->view) this->value = this->max-this->view;
+                        if(!pressed && event != lunaris::mouse::motion){
+                            this->is_clicked = false;
+                        };
+                    };
+                };
+            };
+        };
+        virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
+        }
+    };
+
+    int __how_many_char(const char* text, char schar) {
+        int count = 0;
+        uint64_t text_len = strlen(text);
+        for(int i=0; i<text_len;i++){
+            if(text[i] == schar) count++;
+        };
+        return count;
+    }
+
     const uint32_t textbox_id = request_new_id();
     typedef struct textbox:widget {
         virtual uint32_t get_type(){
@@ -100,13 +211,30 @@ namespace lunaris::ui {
         std::string text = "";
         bool multiline = false;
         uint64_t pos = 0;
+        scrollbar* vscrollbar = NULL;
+        textbox(){
+            this->vscrollbar = new lunaris::ui::scrollbar;
+        };
+        ~textbox(){
+            delete this->vscrollbar;
+        }
         void draw(lunaris::window* win, uint32_t* buffer){
             win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
             char the_text[this->text.size()+1];
             sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-            win->graphics.text(this->fx, this->fy, std::min(this->fh, 20), the_text, 0xFFFF0000);
+            win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, 0xFFFF0000);
+            // Vscrollbar 
+            this->vscrollbar->max = __how_many_char(this->text.c_str(), '\n');
+            this->vscrollbar->view = this->fh/20-1;
+            //TODO: Make sure value doesn't exceed max value: this->vscrollbar->value;
+            this->vscrollbar->__set_f_size(this->fx+this->fw-16, this->fy+0, 16, this->fh);
+            this->vscrollbar->draw(win, buffer);
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+            // Vscrollbar
+            if(x>this->fw-16){
+                return this->vscrollbar->mouse_event(win, x-this->fw, y, pressed, event);
+            }
             if(pressed){
                 win->focused = (void*)this;
                 this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, y);

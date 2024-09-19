@@ -80,6 +80,7 @@ namespace lunaris {
 
                 if(buffer_height<=pos_y) return; // If potantial-area finished, return. Cannot write buffer
                 if(buffer_width<=pos_x) continue; // Exceed width, skip until new line
+                if(pos_y<0 || pos_x < 0) continue; // TODO: Top-left border cutting is not good. Will skip char atm. Fix it to render correctly later.
 
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(the_glyph == 0) continue;
@@ -201,7 +202,10 @@ namespace lunaris {
                 stbtt_GetCodepointHMetrics(&this->info, the_glyph, &advance_width, &left_side_bearing);
                 advance_width *= scale;
 
-                int distance = (clicked_x-pos_x)+(clicked_y-text_height);
+                int ix0, iy0, ix1, iy1;
+                stbtt_GetCodepointBitmapBox(&this->info, the_glyph, scale, scale, &ix0, &iy0, &ix1, &iy1);
+
+                int distance = (clicked_x-pos_x-ix0-(ix1-ix0)/2)+(clicked_y-text_height-iy0-(iy1-iy0)/2)*2;
                 if(founded_pos_distance>distance){
                     founded_pos = i;
                     founded_pos_distance = distance;
