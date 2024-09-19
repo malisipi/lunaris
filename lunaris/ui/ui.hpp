@@ -107,9 +107,10 @@ namespace lunaris::ui {
             win->graphics.text(this->fx, this->fy, std::min(this->fh, 20), the_text, 0xFFFF0000);
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
-            printf("Click at %f, %f\n", x, y);
-            if(pressed)
+            if(pressed){
                 win->focused = (void*)this;
+                this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, y);
+            };
         };
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
             const int text_size = this->text.size();

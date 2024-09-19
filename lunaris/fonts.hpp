@@ -44,6 +44,22 @@ namespace lunaris {
     typedef struct font {
         unsigned char* font_buffer;
         stbtt_fontinfo info;
+        uint32_t __get_glyph_from_text(uint64_t* i, const char* text){ // https://en.wikipedia.org/wiki/UTF-8
+            if(i == NULL) return 0;
+            if((text[*i]&0x80) == 0){ // 1 char unicode (a)
+                return text[*i];
+            } else if ((text[*i] & 0xC0) == 0x80){ // Invalid continuous unicode
+                return 0;
+            } else if((text[*i] & 0xE0) == 0xC0){ // 2 char unicode (ş)
+                return ((text[*i]&0x1F)<<6) | (text[++*i]&0x3F);
+            } else if((text[*i] & 0xF0) == 0xE0) { // 3 char unicode (ह)
+                return ((text[*i]&0x0F)<<12) | ((text[++*i]&0x3F)<<6) | (text[++*i]&0x3F);
+            } else if((text[*i] & 0xF8) == 0xF0) { // 4 char unicode (🐺)
+                return ((text[*i]&0x07)<<18) | ((text[++*i]&0x3F)<<12) | ((text[++*i]&0x3F)<<6) | (text[++*i]&0x3F);
+            } else { // Unknown unicode
+                return 0;
+            };
+        };
         void draw_text(uint32_t* buffer, const int buffer_width, const int buffer_height, const int text_start_x, int text_start_y, const int line_height, const char* text, uint32_t color){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
             
@@ -56,9 +72,7 @@ namespace lunaris {
             descent *= scale;
             line_gap *= scale;
             
-            for (int i = 0; i < strlen(text); i++){
-                uint32_t the_glyph = 0;
-
+            for (uint64_t i = 0; i < strlen(text); i++){
                 if(text[i] == '\n'){ // It's multi-line hack shift
                     pos_x = text_start_x;
                     pos_y += line_height;
@@ -67,20 +81,8 @@ namespace lunaris {
                 if(buffer_height<=pos_y) return; // If potantial-area finished, return. Cannot write buffer
                 if(buffer_width<=pos_x) continue; // Exceed width, skip until new line
 
-                // https://en.wikipedia.org/wiki/UTF-8
-                if((text[i]&0x80) == 0){ // 1 char unicode (a)
-                    the_glyph = text[i];
-                } else if ((text[i] & 0xC0) == 0x80){ // Invalid continuous unicode
-                    continue;
-                } else if((text[i] & 0xE0) == 0xC0){ // 2 char unicode (ş)
-                    the_glyph = ((text[i]&0x1F)<<6) | (text[++i]&0x3F);
-                } else if((text[i] & 0xF0) == 0xE0) { // 3 char unicode (ह)
-                    the_glyph = ((text[i]&0x0F)<<12) | ((text[++i]&0x3F)<<6) | (text[++i]&0x3F);
-                } else if((text[i] & 0xF8) == 0xF0) { // 4 char unicode (🐺)
-                    the_glyph = ((text[i]&0x07)<<18) | ((text[++i]&0x3F)<<12) | ((text[++i]&0x3F)<<6) | (text[++i]&0x3F);
-                } else { // Unknown unicode
-                    continue;
-                };
+                uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
+                if(the_glyph == 0) continue;
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
                     //printf("The glyph is not exist on this font!\n");
                     continue;
@@ -98,17 +100,16 @@ namespace lunaris {
 
                 int bitmap_w = 0;
                 int bitmap_h = 0;
-
+                
                 unsigned char* the_char = stbtt_GetGlyphBitmapSubpixel(&this->info, scale, scale, 0.0f, 0.0f, stbtt_FindGlyphIndex(&info, the_glyph), &bitmap_w, &bitmap_h, 0, 0);
                 int bitmap_stride = bitmap_w;
-                
+
                 if(buffer_height<=bitmap_h+char_y){
                     bitmap_h = buffer_height-char_y;
                 };
-                if(buffer_width<=pos_x+bitmap_w){
-                    bitmap_w = buffer_width-pos_x;
+                if(buffer_width<=pos_x+bitmap_w+left_side_bearing){
+                    bitmap_w = buffer_width-pos_x-left_side_bearing;
                 };
-
                 for(int bitmap_y=0; bitmap_y<bitmap_h; bitmap_y++){
                     for(int bitmap_x=0; bitmap_x<bitmap_w; bitmap_x++){
                         int target_byte = (bitmap_y+char_y)*buffer_width + bitmap_x + left_side_bearing + pos_x;
@@ -122,6 +123,96 @@ namespace lunaris {
                 /*int kern = stbtt_GetCodepointKernAdvance(&this->info, the_glyph, text[i + 1]); // TODO: multi-char unicodes will change i, not safe for those function calls, please fix it.
                 pos_x += kern * scale;*/
             };
+        };
+        std::pair<int, int> bounding_area(const int line_height, const char* text){
+            float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
+            int text_width = 0;
+            int text_height = line_height;
+            int pos_x = 0;
+            int pos_y = 0;
+            
+            int ascent, descent, line_gap;
+            stbtt_GetFontVMetrics(&this->info, &ascent, &descent, &line_gap);
+            ascent *= scale;
+            descent *= scale;
+            line_gap *= scale;
+            
+            for (uint64_t i = 0; i < strlen(text); i++){
+                if(text[i] == '\n'){ // It's multi-line hack shift
+                    pos_x = 0;
+                    pos_y += line_height;
+
+                    text_height = line_height + pos_y;
+                };
+
+                uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
+                if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
+                    //printf("The glyph is not exist on this font!\n");
+                    continue;
+                };
+
+                int advance_width;
+                int left_side_bearing;
+                stbtt_GetCodepointHMetrics(&this->info, the_glyph, &advance_width, &left_side_bearing);
+                advance_width *= scale;
+
+                pos_x += advance_width;
+                
+                /*int kern = stbtt_GetCodepointKernAdvance(&this->info, the_glyph, text[i + 1]); // TODO: multi-char unicodes will change i, not safe for those function calls, please fix it.
+                pos_x += kern * scale;*/
+
+                if(pos_x>text_width) text_width = pos_x;
+            };
+            return std::make_pair(text_width, text_height);
+        };
+        uint64_t get_clicking_pos(const int line_height, const char* text, float clicked_xf, float clicked_yf){
+            float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
+            int text_width = 0;
+            int text_height = line_height;
+            int pos_x = 0;
+            int pos_y = 0;
+            uint64_t founded_pos = 0;
+            uint64_t founded_pos_distance = -1;
+            int clicked_x = (int)clicked_xf;
+            int clicked_y = (int)clicked_yf;
+            
+            int ascent, descent, line_gap;
+            stbtt_GetFontVMetrics(&this->info, &ascent, &descent, &line_gap);
+            ascent *= scale;
+            descent *= scale;
+            line_gap *= scale;
+            
+            for (uint64_t i = 0; i < strlen(text); i++){
+                if(text[i] == '\n'){ // It's multi-line hack shift
+                    pos_x = 0;
+                    pos_y += line_height;
+
+                    text_height = line_height + pos_y;
+                };
+
+                uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
+                if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
+                    //printf("The glyph is not exist on this font!\n");
+                    continue;
+                };
+
+                int advance_width;
+                int left_side_bearing;
+                stbtt_GetCodepointHMetrics(&this->info, the_glyph, &advance_width, &left_side_bearing);
+                advance_width *= scale;
+
+                int distance = (clicked_x-pos_x)+(clicked_y-text_height);
+                if(founded_pos_distance>distance){
+                    founded_pos = i;
+                    founded_pos_distance = distance;
+                };
+
+                pos_x += advance_width;
+                
+                /*int kern = stbtt_GetCodepointKernAdvance(&this->info, the_glyph, text[i + 1]); // TODO: multi-char unicodes will change i, not safe for those function calls, please fix it.
+                pos_x += kern * scale;*/
+            };
+            return founded_pos;
         };
         void destroy (){
             free(this->font_buffer);
