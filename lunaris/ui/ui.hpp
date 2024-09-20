@@ -73,7 +73,7 @@ namespace lunaris::ui {
             return layout_id;
         };
         virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){};
-    };
+    } layout;
 
     const uint32_t button_id = request_new_id();
     typedef struct button:widget {
@@ -90,7 +90,7 @@ namespace lunaris::ui {
             if(pressed)
                 win->focused = (void*)this;
         };
-    };
+    } button;
 
     const uint32_t scrollbar_id = request_new_id();
     typedef struct scrollbar:widget {
@@ -192,7 +192,7 @@ namespace lunaris::ui {
         };
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
         }
-    };
+    } scrollbar;
 
     int __how_many_char(const char* text, char schar) {
         int count = 0;
@@ -263,7 +263,7 @@ namespace lunaris::ui {
                 };
             };
         }
-    };
+    } textbox;
 
     const uint32_t fixed_id = request_new_id();
     typedef struct fixed:layout {
@@ -305,7 +305,7 @@ namespace lunaris::ui {
                 last_child->mouse_event(win, x-last_child->fx+this->fx, y-last_child->fy+this->fy, pressed, event);
             };
         };
-    };
+    } fixed;
 
     const uint32_t grid_id = request_new_id();
     typedef struct grid:layout {
@@ -355,13 +355,13 @@ namespace lunaris::ui {
                 }
             };
         };
-    };
+    } grid;
 
-    namespace query_type {
+    namespace query {
         typedef enum query {
             width,
             height
-        };
+        } query;
     }
 
     const uint32_t dynamic_id = request_new_id();
@@ -370,14 +370,14 @@ namespace lunaris::ui {
             return grid_id;
         };
         std::map<int, widget*> layouts;
-        query_type::query _type = query_type::width;
+        query::query _type = query::width;
         template <typename T> void place(T child, int max_size) {
             this->layouts[max_size] = (widget*)child;
         };
         void ___get_child(widget** child){
             for(std::map<int, widget*>::iterator _layout = this->layouts.begin(); _layout != this->layouts.end(); _layout++){
-                if((_type == query_type::width && _layout->first < this->fw)
-                    ||(_type == query_type::height && _layout->first < this->fh)){
+                if((_type == query::width && _layout->first < this->fw)
+                    ||(_type == query::height && _layout->first < this->fh)){
                     *child = (widget*)(_layout->second);
                     };
             };
@@ -399,7 +399,7 @@ namespace lunaris::ui {
             if(child == NULL) return;
             child->mouse_event(win, x, y, pressed, event);
         };
-    };
+    } dynamic;
 
     const uint32_t window_decorations_id = request_new_id();
     typedef struct window_decorations:layout {
@@ -434,5 +434,5 @@ namespace lunaris::ui {
                 this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, event);
             };
         };
-    };
+    } window_decorations;
 };

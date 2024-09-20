@@ -272,7 +272,7 @@ namespace lunaris {
             win->__mouse_last_serial = serial;
             if(win->mouse_handler != NULL){
                 win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, mouse::leave);
-            }
+            };
         },
         .motion=[](void* data, struct wl_pointer* pointer, uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
             lunaris::window* win = (lunaris::window*)data;
