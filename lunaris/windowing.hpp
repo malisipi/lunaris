@@ -179,6 +179,11 @@ namespace lunaris {
     void __backend_set_cursor(lunaris::window*, lunaris::cursor::cursor);
     void __backend_start_move(lunaris::window*);
     void __backend_set_visibility(lunaris::window*, bool);
+    void __backend_minimize(lunaris::window*);
+    void __backend_maximize(lunaris::window*);
+    void __backend_restore(lunaris::window*);
+    void __backend_start_resize(lunaris::window*);
+    void __backend_show_window_menu(lunaris::window*, int, int);
 
     struct window {
         bool is_alive = false;
@@ -197,7 +202,12 @@ namespace lunaris {
         void set_fullscreen(bool fullscreen){ return __backend_set_fullscreen(this, fullscreen); }
         void set_cursor(lunaris::cursor::cursor cursor) { return __backend_set_cursor(this, cursor); };
         void set_visibility(bool visible) { return __backend_set_visibility(this, visible); };
-        void start_move(){ return __backend_start_move(this); }
+        void show_window_menu(int x, int y) { return __backend_show_window_menu(this, x, y); };
+        void start_move(){ return __backend_start_move(this); };
+        void minimize(){ return __backend_minimize(this); };
+        void maximize(){ return __backend_maximize(this); };
+        void restore(){ return __backend_restore(this); };
+        void start_resize(){ return __backend_start_resize(this); };
         int width;
         int height;
         void* data; // Area for user data; Not used by library
@@ -256,7 +266,7 @@ namespace lunaris {
                     const int ys = (xs==x1) ? y1 : y2;
                     const int ye = (xs!=x1) ? y1 : y2;
                     
-                    for(int x=0; x < width; x++){
+                    for(int x=0; x <= width; x++){
                         const int rel_start_y = -thickness/2;
                         for(int rel_y=rel_start_y;rel_y<thickness+rel_start_y;rel_y++){
                             this->pixel(xs+x, ys+(ye-ys)*x/width+rel_y, color);
@@ -267,7 +277,7 @@ namespace lunaris {
                     const int xs = (ys==y1) ? x1 : x2;
                     const int xe = (ys!=y1) ? x1 : x2;
                     
-                    for(int y=0; y < height; y++){
+                    for(int y=0; y <= height; y++){
                         const int rel_start_x = -thickness/2;
                         for(int rel_x=rel_start_x;rel_x<thickness+rel_start_x;rel_x++){
                             this->pixel(xs+(xe-xs)*y/height+rel_x, ys+y, color);

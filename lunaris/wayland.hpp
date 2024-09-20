@@ -449,7 +449,7 @@ namespace lunaris {
     };
 
     const struct xdg_toplevel_listener toplevel_listener = {
-        .configure = [](void* data, struct xdg_toplevel *xdg_toplevel, int32_t width, int32_t height, struct wl_array *states) {
+        .configure = [](void* data, struct xdg_toplevel* xdg_toplevel, int32_t width, int32_t height, struct wl_array* states) {
             if (width > 0 && height > 0) {
                 lunaris::window* win = (lunaris::window*)data;
                 win->resize(width, height);
@@ -588,6 +588,26 @@ namespace lunaris {
             wl_display_disconnect(win->__display);
             win->__display = NULL;
         };
+    };
+
+    void __backend_show_window_menu(lunaris::window* win, int x, int y){
+        xdg_toplevel_show_window_menu(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial, x, y);
+    };
+
+    void __backend_minimize(lunaris::window* win){
+        xdg_toplevel_set_minimized(win->__xdg_toplevel);
+    };
+
+    void __backend_maximize(lunaris::window* win){
+        xdg_toplevel_set_maximized(win->__xdg_toplevel);
+    };
+
+    void __backend_restore(lunaris::window* win){
+        xdg_toplevel_unset_maximized(win->__xdg_toplevel);
+    };
+
+    void __backend_start_resize(lunaris::window* win){
+        xdg_toplevel_resize(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial, XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT);
     };
 
     void __backend_set_title(lunaris::window* win, char* title){
