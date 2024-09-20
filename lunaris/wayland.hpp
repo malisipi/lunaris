@@ -221,6 +221,7 @@ namespace lunaris {
     }
 
     void __backend_set_cursor(lunaris::window* win, lunaris::cursor::cursor cursor){
+        if(win->__cursor_shape_manager == NULL) return;
         using namespace cursor;
 
         if(cursor == arrow) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_DEFAULT);
@@ -331,7 +332,9 @@ namespace lunaris {
                 if(win->__pointer == NULL) {
                     win->__pointer = wl_seat_get_pointer(seat);
                     wl_pointer_add_listener(win->__pointer, &pointer_listener, win);
-                    win->__cursor_shape_device = wp_cursor_shape_manager_v1_get_pointer(win->__cursor_shape_manager, win->__pointer);
+                    if(win->__cursor_shape_manager != NULL){
+                        win->__cursor_shape_device = wp_cursor_shape_manager_v1_get_pointer(win->__cursor_shape_manager, win->__pointer);
+                    };
                 }
             }
             if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
@@ -421,6 +424,9 @@ namespace lunaris {
     }
 
     bool __backend_set_decoration(lunaris::window* win, bool decorated) {
+        if(win->__zxdg_decoration_manager_id == 0){
+            return false;
+        };
         if(win->__zxdg_decoration_manager == NULL) win->__zxdg_decoration_manager = (zxdg_decoration_manager_v1*)wl_registry_bind(wl_display_get_registry(win->__display), win->__zxdg_decoration_manager_id, &zxdg_decoration_manager_v1_interface, 1);
         if(win->__zxdg_decoration == NULL) win->__zxdg_decoration = zxdg_decoration_manager_v1_get_toplevel_decoration(win->__zxdg_decoration_manager, win->__xdg_toplevel);
         if(decorated){
