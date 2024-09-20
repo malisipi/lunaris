@@ -57,7 +57,7 @@
 #include "images.hpp"
 
 namespace lunaris {
-    typedef struct window;
+    typedef struct window window;
 
     namespace mouse {
         typedef enum mouse {
@@ -101,7 +101,7 @@ namespace lunaris {
             vertical_text, // WIN32 (Extended Cursors), Wayland
             zoom_in, // WIN32 (Extended Cursors), Wayland
             zoom_out // WIN32 (Extended Cursors), Wayland
-        };
+        } cursor;
     };
 
     namespace keyboard {
@@ -109,7 +109,7 @@ namespace lunaris {
             pressed,
             released,
             repeated
-        };
+        } keyboard;
     };
 
     namespace keycode {
@@ -166,7 +166,7 @@ namespace lunaris {
             insert,
             _delete,
             _pause
-        };
+        } keycode;
     };
 
     lunaris::window* new_window(void);
