@@ -401,4 +401,38 @@ namespace lunaris::ui {
         };
     };
 
+    const uint32_t window_decorations_id = request_new_id();
+    typedef struct window_decorations:layout {
+        virtual uint32_t get_type(){
+            return window_decorations_id;
+        };
+        widget* child = NULL;
+        bool should_decorated = true;
+        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+            int top_offset = 0;
+            if(this->should_decorated){
+                top_offset = 30;
+                win->graphics.rect(this->fx, this->fy, this->fw, top_offset, 0xFF666666);
+            };
+            if(this->child != NULL){
+                this->child->__set_f_size(this->child->rx+this->fx, this->child->ry+this->fy+top_offset, this->fw, this->fh-top_offset);
+                if(this->child->is_layout()){
+                    ((layout*)this->child)->calculate_n_draw(win, buffer);
+                } else {
+                    this->child->draw(win, buffer);
+                };
+            };
+        };
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+            if(this->should_decorated){
+                if(y<=30){
+                    if(pressed && event == lunaris::mouse::first) win->start_move();
+                } else if(this->child != NULL){
+                    this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy-30, pressed, event);
+                };
+            } else {
+                this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, event);
+            };
+        };
+    };
 };
