@@ -64,6 +64,7 @@ namespace lunaris {
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
             
             int pos_x = text_start_x;
+            //int pos_x = text_start_x + line_height/3; // For italic
             int pos_y = text_start_y;
             
             int ascent, descent, line_gap;
@@ -75,6 +76,7 @@ namespace lunaris {
             for (uint64_t i = 0; i < strlen(text); i++){
                 if(text[i] == '\n'){ // It's multi-line hack shift
                     pos_x = text_start_x;
+                    // pos_x = text_start_x + line_height/3; // For italic
                     pos_y += line_height;
                 };
 
@@ -115,9 +117,16 @@ namespace lunaris {
                     for(int bitmap_x=0; bitmap_x<bitmap_w; bitmap_x++){
                         int target_byte = (bitmap_y+char_y)*buffer_width + bitmap_x + left_side_bearing + pos_x;
                         buffer[target_byte] = color_mix(buffer[target_byte], color, (float)the_char[bitmap_stride*bitmap_y + bitmap_x]/(float)255);
+                        // buffer[target_byte-(bitmap_y/3)] = color_mix(buffer[target_byte], color, (float)the_char[bitmap_stride*bitmap_y + bitmap_x]/(float)255);  // For italic
                     };
                 };
                 free(the_char);
+
+                /*for(int sx=0;sx<advance_width;sx++){
+                    buffer[(pos_y+line_height*4/5)*buffer_width+pos_x+sx] = color; // Underlined
+                    buffer[(pos_y+line_height/2)*buffer_width+pos_x+sx] = color; // Strikethrough
+                    buffer[(pos_y+line_height/5)*buffer_width+pos_x+sx] = color; // Overlined
+                };*/
 
                 pos_x += advance_width;
                 
