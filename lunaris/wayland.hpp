@@ -261,7 +261,7 @@ namespace lunaris {
             win->__mouse_y = (float)wl_fixed_to_double(surface_y);
             win->__mouse_last_serial = serial;
             if(win->mouse_handler != NULL){
-                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, mouse::enter);
+                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::enter);
             };
         },
         .leave=[](void* data, struct wl_pointer* pointer, uint32_t serial, struct wl_surface* surface) {
@@ -271,7 +271,7 @@ namespace lunaris {
             #endif
             win->__mouse_last_serial = serial;
             if(win->mouse_handler != NULL){
-                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, mouse::leave);
+                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::leave);
             };
         },
         .motion=[](void* data, struct wl_pointer* pointer, uint32_t time, wl_fixed_t surface_x, wl_fixed_t surface_y) {
@@ -282,7 +282,7 @@ namespace lunaris {
             win->__mouse_x = (float)wl_fixed_to_double(surface_x);
             win->__mouse_y = (float)wl_fixed_to_double(surface_y);
             if(win->mouse_handler != NULL){
-                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, mouse::motion);
+                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::motion);
             }
         },
         .button=[](void* data, struct wl_pointer* pointer, uint32_t serial, uint32_t time, uint32_t button, uint32_t state) {
@@ -299,7 +299,7 @@ namespace lunaris {
                 if(button == 274) the_event = mouse::middle;
                 if(button == 275) the_event = mouse::x1;
                 if(button == 276) the_event = mouse::x2;
-                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, state == WL_POINTER_BUTTON_STATE_PRESSED, the_event);
+                win->mouse_handler(win, win->__mouse_x, win->__mouse_y, state == WL_POINTER_BUTTON_STATE_PRESSED, 0, 0, the_event);
             };
         },
         .axis=[](void* data, struct wl_pointer* pointer, uint32_t time, uint32_t axis, wl_fixed_t value) {
@@ -310,9 +310,9 @@ namespace lunaris {
             #endif
             if(win->mouse_handler != NULL){
                 if(axis == 0){ // Vertical (Y)
-                    win->mouse_handler(win, 0, wl_fixed_to_double(value), 0, mouse::scroll);
+                    win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, wl_fixed_to_double(value), mouse::scroll);
                 } else { // == 1; Horizontal (X)
-                    win->mouse_handler(win, wl_fixed_to_double(value), 0, 0, mouse::scroll);
+                    win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, wl_fixed_to_double(value), 0, mouse::scroll);
                 };
             };
         },

@@ -212,7 +212,7 @@ namespace lunaris {
         int height;
         void* data; // Area for user data; Not used by library
         void(*draw_handler)(lunaris::window*, uint32_t*) = NULL;
-        void(*mouse_handler)(lunaris::window*, float x, float y, bool pressed, lunaris::mouse::mouse event);
+        void(*mouse_handler)(lunaris::window*, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event);
         void(*keyboard_handler)(lunaris::window*, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event);
         uint32_t* buffer; // Only for draw_handler access, is not threadsafe; exist for graphics API
         struct {
