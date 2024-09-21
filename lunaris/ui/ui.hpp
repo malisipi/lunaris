@@ -59,7 +59,7 @@ namespace lunaris::ui {
             this->aw = w;
             this->ah = h;
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){ /*printf("Mouse at %f, %f\n", x, y);*/ };
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){ /*printf("Mouse at %f, %f\n", x, y);*/ };
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){};
     } widget;
 
@@ -85,7 +85,7 @@ namespace lunaris::ui {
             win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
             win->graphics.text(this->fx, this->fy, std::min(this->fh, 20), this->text.c_str(), 0xFFFF0000);
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             printf("Click at %f, %f\n", x, y);
             if(pressed)
                 win->focused = (void*)this;
@@ -123,10 +123,20 @@ namespace lunaris::ui {
                 };
             };
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
-            if(!this->horizontal){ // vertical
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
+            int area = this->max-this->view;
+            if(event == lunaris::mouse::scroll){
+                if(dx<0 || dy<0) {
+                    if(this->value>0){
+                        this->value--;
+                    };
+                } else {
+                    if(area>this->value){
+                        this->value++;
+                    };
+                }
+            } else if(!this->horizontal){ // vertical
                 if(pressed){
-                    int area = this->max-this->view;
                     if(y<18){
                         _scroll_up:
                         if(this->value>0){
@@ -158,7 +168,6 @@ namespace lunaris::ui {
                 };
             } else { // horizontal
                 if(pressed){
-                    int area = this->max-this->view;
                     if(x<18){
                         _scroll_left:
                         if(this->value>0){
@@ -230,11 +239,11 @@ namespace lunaris::ui {
             this->vscrollbar->__set_f_size(this->fx+this->fw-16, this->fy+0, 16, this->fh);
             this->vscrollbar->draw(win, buffer);
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             // Vscrollbar
-            if(x>this->fw-16){
-                return this->vscrollbar->mouse_event(win, x-this->fw, y, pressed, event);
-            }
+            if(x>this->fw-16 || event == lunaris::mouse::scroll){
+                return this->vscrollbar->mouse_event(win, x-this->fw, y, pressed, dx, dy, event);
+            };
             if(pressed){
                 win->focused = (void*)this;
                 this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, y);
@@ -293,7 +302,7 @@ namespace lunaris::ui {
                 };
             };
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             widget* last_child = NULL;
             for(std::vector<widget*>::iterator child_ptr = this->childs.begin(); child_ptr != this->childs.end(); child_ptr++){
                 widget* child = *child_ptr;
@@ -302,7 +311,7 @@ namespace lunaris::ui {
                 };
             };
             if(last_child != NULL){
-                last_child->mouse_event(win, x-last_child->fx+this->fx, y-last_child->fy+this->fy, pressed, event);
+                last_child->mouse_event(win, x-last_child->fx+this->fx, y-last_child->fy+this->fy, pressed, dx, dy, event);
             };
         };
     } fixed;
@@ -343,14 +352,14 @@ namespace lunaris::ui {
                 };
             };
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             int grid_index = -1;
             int grid_planned_count = row_count*col_count;
             for(std::vector<widget*>::iterator child_ptr = this->childs.begin(); child_ptr != this->childs.end(); child_ptr++){
                 if(++grid_index >= grid_planned_count) break; // Exceed the planned area of grid, so i can not place them if
                 widget* child = *child_ptr;
                 if(((child->fx-this->fx<=x) && (child->fx-this->fx+child->fw>=x)) && ((child->fy-this->fy<=y) && (child->fy-this->fy+child->fh>=y))){
-                    child->mouse_event(win, x-child->fx+this->fx, y-child->fy+this->fy, pressed, event);
+                    child->mouse_event(win, x-child->fx+this->fx, y-child->fy+this->fy, pressed, dx, dy, event);
                     return;
                 }
             };
@@ -393,11 +402,11 @@ namespace lunaris::ui {
                 child->draw(win, buffer);
             };
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             widget* child = NULL;
             ___get_child(&child);
             if(child == NULL) return;
-            child->mouse_event(win, x, y, pressed, event);
+            child->mouse_event(win, x, y, pressed, dx, dy, event);
         };
     } dynamic;
 
@@ -456,7 +465,7 @@ namespace lunaris::ui {
                 };
             };
         };
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, lunaris::mouse::mouse event){
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             if(this->should_decorated){
                 if(y<=30){
                     if(pressed) {
@@ -483,11 +492,11 @@ namespace lunaris::ui {
                     if(win->width+win->height-20<x+y){
                         win->start_resize();
                     } else {
-                        this->child->mouse_event(win, x-this->fx+this->fx, y-this->fy-30, pressed, event);
+                        this->child->mouse_event(win, x-this->fx+this->fx, y-this->fy-30, pressed, dx, dy, event);
                     };
                 };
             } else {
-                this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, event);
+                this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
             };
         };
     } window_decorations;
