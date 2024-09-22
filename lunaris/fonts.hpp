@@ -181,8 +181,6 @@ namespace lunaris {
             int text_height = line_height;
             int pos_x = 0;
             int pos_y = 0;
-            uint64_t founded_pos = 0;
-            uint64_t founded_pos_distance = -1;
             int clicked_x = (int)clicked_xf;
             int clicked_y = (int)clicked_yf;
             
@@ -193,12 +191,17 @@ namespace lunaris {
             line_gap *= scale;
             
             for (uint64_t i = 0; i < strlen(text); i++){
+                const bool is_on_clicked_line = pos_y < clicked_y && pos_y + line_height >= clicked_y;
                 if(text[i] == '\n'){ // It's multi-line hack shift
+                    if(is_on_clicked_line){
+                        return i;
+                    };
                     pos_x = 0;
                     pos_y += line_height;
 
                     text_height = line_height + pos_y;
                 };
+                if(!is_on_clicked_line) continue;
 
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
@@ -214,18 +217,15 @@ namespace lunaris {
                 int ix0, iy0, ix1, iy1;
                 stbtt_GetCodepointBitmapBox(&this->info, the_glyph, scale, scale, &ix0, &iy0, &ix1, &iy1);
 
-                int distance = (clicked_x-pos_x-ix0-(ix1-ix0)/2)+(clicked_y-text_height-iy0-(iy1-iy0)/2)*2;
-                if(founded_pos_distance>distance){
-                    founded_pos = i;
-                    founded_pos_distance = distance;
-                };
-
                 pos_x += advance_width;
+                if(pos_x>clicked_x){
+                    return i;
+                }
                 
                 /*int kern = stbtt_GetCodepointKernAdvance(&this->info, the_glyph, text[i + 1]); // TODO: multi-char unicodes will change i, not safe for those function calls, please fix it.
                 pos_x += kern * scale;*/
             };
-            return founded_pos;
+            return strlen(text);
         };
         void destroy (){
             free(this->font_buffer);
