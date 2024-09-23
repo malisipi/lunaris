@@ -31,4 +31,13 @@ extern "C" {
     int lunaris_window_get_height(lunaris_window* win){
         return win->height;
     };
+    void lunaris_window_graphics_line(lunaris_window* win, int x1, int y1, int x2, int y2, uint32_t color){
+        win->graphics.line(x1, y1, x2, y2, color);
+    };
+    void lunaris_window_graphics_line_thick(lunaris_window* win, int x1, int y1, int x2, int y2, int s, uint32_t color){
+        win->graphics.line_thick(x1, y1, x2, y2, s, color);
+    };
+    void lunaris_window_graphics_rect(lunaris_window* win, int x, int y, int w, int h, uint32_t color){
+        win->graphics.rect(x, y, w, h, color);
+    };
 }
