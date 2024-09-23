@@ -8,3 +8,5 @@ lunaris/haiku.hpp
 lunaris/x11.hpp
 lunaris/windows.hpp
 *.png
+*.dll
+*.so
