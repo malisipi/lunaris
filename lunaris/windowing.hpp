@@ -475,7 +475,6 @@ namespace lunaris {
 
 };
 
-
 #ifdef wayland
 #include "wayland.hpp"
 #endif
