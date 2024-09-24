@@ -12,15 +12,16 @@ namespace lunaris {
         }
     } layer;
 
-    lunaris::layer* new_image(char* path){
+    lunaris::layer* new_image(const char* path){
         if (access(path, F_OK) != 0) return NULL; // If not exist
         lunaris::layer* layer = (lunaris::layer*)malloc(sizeof(lunaris::layer));
         int width;
         int height;
         int channels;
         uint32_t* temp_data = (uint32_t*)stbi_load(path, &width, &height, &channels, 0); // TODO: May has problems with <4 channel images
-        if(layer->data == NULL){
+        if(temp_data == NULL){
             free(layer);
+            stbi_image_free(temp_data);
             printf("Cannot loaded the image that has the path: %s", path);
             return NULL;
         };
