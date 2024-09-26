@@ -28,6 +28,10 @@ namespace lunaris::ui {
         int fy = 0;
         int fw = 0;
         int fh = 0;
+        bool is_hovering = false; // all layouts and semi-layout widgets (the widgets that has widgets)
+        virtual void set_hovering(bool is_hovering){
+            this->is_hovering = is_hovering;
+        };
         //bool can_exceed_size;
         virtual uint32_t get_type(){
             return 0;
@@ -86,16 +90,17 @@ namespace lunaris::ui {
         };
         std::string text = "";
         void draw(lunaris::window* win, uint32_t* buffer){
-            win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
-            win->graphics.text(this->fx, this->fy, std::min(this->fh, 20), this->text.c_str(), 0xFFFF0000);
+            win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, 0xFFE6E6E6);
+            const int text_line_height = std::min(this->fh, 20);
+            std::pair<int, int> text_size = win->graphics.text_bounding_area(text_line_height, this->text.c_str());
+            win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), 0xFF000000);
         };
         void(*click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
         void(*double_click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
-        //std::chrono::time_point previous_click;
         __uint128_t previous_click = 0;
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
-            win->focused = (void*)this;
             if(pressed){
+                    win->focused = (void*)this;
                     __uint128_t the_click = __get_event_time();
                     __uint128_t elapsed_time = the_click-this->previous_click;
                     if(elapsed_time>350){
@@ -128,27 +133,37 @@ namespace lunaris::ui {
         int clicked_value = 0;
         bool is_clicked = false;
         bool horizontal = false;
+        int _mouse_x = 0;
+        int _mouse_y = 0;
         void draw(lunaris::window* win, uint32_t* buffer){
             if(this->view < this->max){
                 if(!this->horizontal){ // vertical
-                    win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFF888888);
-                    win->graphics.rect(this->fx, this->fy, this->fw, 16, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx, this->fy+18, this->fw, this->fh-36, 0xFFCCCCCC);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, 0xFFF1F1F1);
+                    if(this->is_hovering && this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy, this->fw, 16, 5, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+4, 8, 8, 0xFFA0A0A0);
                     float size = (float)(this->fh-36)/(float)(this->max);
-                    win->graphics.rect(this->fx, this->fy+18+size*this->value, this->fw, size*this->view, 0xFFDDDDDD);
-                    win->graphics.rect(this->fx, this->fy+this->fh-16, this->fw, 16, 0xFFCCCCCC);
+                    uint32_t hovered_color = 0xFFC0C0C0;
+                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_y) && ((18+size*this->value+size*this->view)>this->_mouse_y)) hovered_color = 0xFFA0A0A0;
+                    win->graphics.rounded_rect(this->fx, this->fy+18+size*this->value, this->fw, size*this->view, 5, hovered_color);
+                    if(this->is_hovering && this->fh-this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy+this->fh-16, this->fw, 16, 5, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+this->fh-12, 8, 8, 0xFFA0A0A0);
                 } else { // horizontal
-                    win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFF888888);
-                    win->graphics.rect(this->fx, this->fy, 16, this->fh, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx+18, this->fy, this->fw-36, this->fh, 0xFFCCCCCC);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, 0xFFF1F1F1);
+                    if(this->is_hovering && this->_mouse_x<16) win->graphics.rounded_rect(this->fx, this->fy, 16, this->fh, 5, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx+4, this->fy+this->fh/2-4, 8, 8, 0xFFA0A0A0);
                     float size = (float)(this->fw-36)/(float)(this->max);
-                    win->graphics.rect(this->fx+18+size*this->value, this->fy, size*this->view, this->fh, 0xFFDDDDDD);
-                    win->graphics.rect(this->fx+this->fw-16, this->fy, 16, this->fh, 0xFFCCCCCC);
+                    uint32_t hovered_color = 0xFFC0C0C0;
+                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_x) && ((18+size*this->value+size*this->view)>this->_mouse_x)) hovered_color = 0xFFA0A0A0;
+                    win->graphics.rounded_rect(this->fx+18+size*this->value, this->fy, size*this->view, this->fh, 5, hovered_color);
+                    if(this->is_hovering && this->fw-this->_mouse_x<16) win->graphics.rounded_rect(this->fx+this->fw-16, this->fy, 16, this->fh, 5, 0xFFCCCCCC);
+                    win->graphics.rect(this->fx+this->fw-12, this->fy+this->fh/2-4, 8, 8, 0xFFA0A0A0);
                 };
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             int area = this->max-this->view;
+            this->_mouse_x = x;
+            this->_mouse_y = y;
             if(event == lunaris::mouse::scroll){
                 if(dx<0 || dy<0) {
                     if(this->value>0){
@@ -250,7 +265,11 @@ namespace lunaris::ui {
         };
         ~textbox(){
             delete this->vscrollbar;
-        }
+        };
+        virtual void set_hovering(bool is_hovering){
+            this->is_hovering = is_hovering;
+            if(!this->is_hovering) this->vscrollbar->set_hovering(false);
+        };
         void draw(lunaris::window* win, uint32_t* buffer){
             win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
             char the_text[this->text.size()+1];
@@ -265,6 +284,7 @@ namespace lunaris::ui {
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             // Vscrollbar
+            this->vscrollbar->set_hovering(x>this->fw-16);
             if(x>this->fw-16 || event == lunaris::mouse::scroll){
                 return this->vscrollbar->mouse_event(win, x-this->fw, y, pressed, dx, dy, event);
             };
@@ -384,7 +404,10 @@ namespace lunaris::ui {
                 widget* child = *child_ptr;
                 if(((child->fx-this->fx<=x) && (child->fx-this->fx+child->fw>=x)) && ((child->fy-this->fy<=y) && (child->fy-this->fy+child->fh>=y))){
                     child->mouse_event(win, x-child->fx+this->fx, y-child->fy+this->fy, pressed, dx, dy, event);
-                    return;
+                    child->set_hovering(true);
+                    //return;
+                } else {
+                    child->set_hovering(false);
                 }
             };
         };
