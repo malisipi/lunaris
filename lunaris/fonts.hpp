@@ -175,7 +175,7 @@ namespace lunaris {
             };
             return std::make_pair(text_width, text_height);
         };
-        uint64_t get_clicking_pos(const int line_height, const char* text, float clicked_xf, float clicked_yf){
+        uint64_t get_clicking_pos(const int line_height, const char* text, float clicked_xf, float clicked_yf, int skip_lines){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
             int text_width = 0;
             int text_height = line_height;
@@ -191,6 +191,10 @@ namespace lunaris {
             line_gap *= scale;
             
             for (uint64_t i = 0; i < strlen(text); i++){
+                if(skip_lines>0){
+                    if(text[i] == '\n') skip_lines--;
+                    continue;
+                }
                 const bool is_on_clicked_line = pos_y < clicked_y && pos_y + line_height >= clicked_y;
                 if(text[i] == '\n'){ // It's multi-line hack shift
                     if(is_on_clicked_line){

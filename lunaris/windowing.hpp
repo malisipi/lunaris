@@ -223,11 +223,12 @@ namespace lunaris {
                 this->font = new_font(get_system_font());
             };
             inline void pixel (int x, int y, uint32_t color){
-                outer->buffer[outer->width*y+x] = color;
+                if(x>=0 && y>=0 && x<outer->width && y<outer->height) outer->buffer[outer->width*y+x] = color;
             };
             inline void block (int x, int y, int w, uint32_t color){
+                // TODO: optimize with memcpy
                 for(int _x=x;_x<x+w;_x++){
-                    outer->buffer[outer->width*y+_x] = color;
+                    this->pixel(_x,y,color);
                 };
             }
             void rect(int x, int y, int w, int h, uint32_t color){
