@@ -588,4 +588,31 @@ namespace lunaris::ui {
             };
         };
     } window_decorations;
+
+    void draw_handler(lunaris::window* win, uint32_t* buffer){
+        win->graphics.rect(0, 0, win->width, win->height, 0xFFFAFAFA);
+
+        lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
+        layout->__set_f_size(0, 0, win->width, win->height);
+        layout->calculate_n_draw(win, buffer);
+
+        /*if(win->focused != NULL) {
+            win->graphics.rect_empty(((lunaris::ui::widget*)win->focused)->fx-1, ((lunaris::ui::widget*)win->focused)->fy-1, ((lunaris::ui::widget*)win->focused)->fw+2, ((lunaris::ui::widget*)win->focused)->fh+2, 2, 0xFFAAAAAA);
+        };*/
+    };
+
+    void mouse_handler(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
+        lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
+        layout->mouse_event(win, x, y, pressed, dx, dy, event);
+    };
+
+    void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
+        if(win->focused != NULL) ((lunaris::ui::widget*)win->focused)->keyboard_handler(win, new_char, key, modifiers, event);
+    };
+
+    void assign_handlers(lunaris::window* win){
+        win->draw_handler = lunaris::ui::draw_handler;
+        win->mouse_handler = lunaris::ui::mouse_handler;
+        win->keyboard_handler = lunaris::ui::keyboard_handler;
+    };
 };
