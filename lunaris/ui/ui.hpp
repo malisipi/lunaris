@@ -578,7 +578,7 @@ namespace lunaris::ui {
                     };
                 } else if(this->child != NULL){
                     if(win->width+win->height-20<x+y){
-                        win->start_resize();
+                        if(pressed && event == lunaris::mouse::first) win->start_resize();
                     } else {
                         this->child->mouse_event(win, x-this->fx+this->fx, y-this->fy-30, pressed, dx, dy, event);
                     };
