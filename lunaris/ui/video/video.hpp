@@ -32,11 +32,17 @@ namespace lunaris::ui {
                 printf("dmpv_render_context_create failed\n");
                 return;
             };
-
-            // const char* file[] = {(char*)"loadfile", (char*)"/path/to/file.mp3", NULL};
-
+        };
+        void load_media(std::string file_name){
+            dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
+            const char* file[] = {(char*)"loadfile", file_name.c_str(), NULL};
             dmpv_command_async(this->mpv_handle, 0, file);
+        };
+        void play(){
             dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"no");
+        };
+        void pause(){
+            dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
         };
         void draw(lunaris::window* win, uint32_t* buffer){
             const int resolution[2] = {this->fw, this->fh};
