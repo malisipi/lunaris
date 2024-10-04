@@ -1,4 +1,13 @@
+#include <iostream>
+
 namespace lunaris::ui::native_dialogs {
+    void clean_text(char* text){
+        const char* dangerous_char_list = "$@(){}`<>|&#\"\\/*;^?'";
+        uint32_t text_len = strlen(text);
+        for(uint32_t x=0; x<text_len; x++){
+            if(strchr(dangerous_char_list, text[x])) text[x] = ' ';
+        };
+    };
     std::string open_file(){
         #ifndef _WIN32
             const char* command = "kdialog --getopenfilename ~"; // TODO: Add support for Zenity
@@ -34,6 +43,22 @@ namespace lunaris::ui::native_dialogs {
                 return file_path;
             }; // else
             return NULL;
+        #endif
+    };
+
+    void messagebox(std::string text, std::string title){
+        #ifndef _WIN32
+            char command[1024*9];
+            char text_cleaned[1024*4];
+            sprintf(text_cleaned, "%s", text.c_str());
+            clean_text(text_cleaned);
+            char title_cleaned[1024*4];
+            sprintf(title_cleaned, "%s", title.c_str());
+            clean_text(title_cleaned);
+            sprintf(command, "kdialog --msgbox \"%s\" --title \"%s\"", text_cleaned, title_cleaned);
+            system(command);
+        #else
+            MessageBox(NULL, text.c_str(), title.c_str(), MB_OK);
         #endif
     };
 };
