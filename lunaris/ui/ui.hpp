@@ -509,11 +509,16 @@ namespace lunaris::ui {
          * | Titlebar (Max) | - (30|50) | [] (30|50) | x (30|50) | -> Height: 30
          */
         bool __is_maximized = false;
+        char title[512] = "";
         virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
             int top_offset = 0;
             if(this->should_decorated){
                 top_offset = 30;
                 win->graphics.rect(this->fx, this->fy, this->fw, top_offset, 0xFF666666);
+
+                win->graphics.text(8, 4, 22, this->title, 0xFFFFFFFF);
+
+                // Close
                 win->graphics.rect(this->fx+this->fw-50,this->fy, 50, 30, 0xFF999999);
                 win->graphics.line_thick(this->fx+this->fw-30,this->fy+10,this->fx+this->fw-20,this->fy+20,2,0xFFFFFFFF);
                 win->graphics.line_thick(this->fx+this->fw-20,this->fy+10,this->fx+this->fw-30,this->fy+20,2,0xFFFFFFFF);
@@ -586,6 +591,13 @@ namespace lunaris::ui {
             } else {
                 this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
             };
+        };
+        void set_title(const char* new_title){
+            sprintf(this->title, "%s", new_title);
+        };
+        void set_title(lunaris::window* win, const char* new_title){
+            this->set_title(new_title);
+            win->set_title(new_title);
         };
     } window_decorations;
 

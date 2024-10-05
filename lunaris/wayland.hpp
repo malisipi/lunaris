@@ -610,7 +610,7 @@ namespace lunaris {
         xdg_toplevel_resize(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial, XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT);
     };
 
-    void __backend_set_title(lunaris::window* win, char* title){
+    void __backend_set_title(lunaris::window* win, const char* title){
         xdg_toplevel_set_title(win->__xdg_toplevel, title);
     };
 }
