@@ -314,7 +314,7 @@ namespace lunaris {
         DestroyWindow(win->__hwnd);
     };
 
-    void __backend_set_title(lunaris::window* win, char* title){
+    void __backend_set_title(lunaris::window* win, const char* title){
         SetWindowText(win->__hwnd, title);
     };
 

@@ -173,7 +173,7 @@ namespace lunaris {
     void __backend_loop(lunaris::window*);
     void __backend_resize(lunaris::window*, int, int);
     void __backend_destroy(lunaris::window*);
-    void __backend_set_title(lunaris::window*, char*);
+    void __backend_set_title(lunaris::window*, const char*);
     bool __backend_set_decoration(lunaris::window*, bool);
     void __backend_set_fullscreen(lunaris::window*, bool);
     void __backend_set_cursor(lunaris::window*, lunaris::cursor::cursor);
@@ -196,7 +196,7 @@ namespace lunaris {
             };
         };
         void resize(int w, int h){ return __backend_resize(this, w, h); }
-        void set_title(char* title){ return __backend_set_title(this, title); }
+        void set_title(const char* title){ return __backend_set_title(this, title); }
         void loop(void){ return __backend_loop(this); }
         bool set_decoration(bool decorated){ return __backend_set_decoration(this, decorated); }
         void set_fullscreen(bool fullscreen){ return __backend_set_fullscreen(this, fullscreen); }

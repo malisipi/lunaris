@@ -114,8 +114,20 @@ namespace lunaris::ui::game {
             };
         };
         void (*game_process)(lunaris::window* win, game_surface* surface, float delta) = NULL;
-        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){};
-        virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){};
+        std::map<lunaris::keycode::keycode, bool> key_states;
+        bool is_pressed(lunaris::keycode::keycode keycode){
+            return this->key_states[keycode];
+        };
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
+            win->focused = this;
+        };
+        virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
+            if(event == lunaris::keyboard::pressed) {
+                this->key_states[key] = true;
+            } else if(event == lunaris::keyboard::released) {
+                this->key_states[key] = false;
+            }
+        };
     } game_surface;
 
     const uint32_t sprite_id = request_new_id();
