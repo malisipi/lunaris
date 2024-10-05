@@ -13,10 +13,10 @@ namespace lunaris::ui {
 
     typedef struct widget {
         // Relative to layout
-        int rx = 0;
-        int ry = 0;
-        int rw = 0;
-        int rh = 0;
+        float rx = 0;
+        float ry = 0;
+        float rw = 0;
+        float rh = 0;
         // Relative to layout, should be used while storing anchor points
         bool used_anchor = false;
         const char* ax = 0;
