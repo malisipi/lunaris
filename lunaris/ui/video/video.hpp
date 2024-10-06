@@ -61,7 +61,7 @@ namespace lunaris::ui {
                 return;
             };
 
-            for(int render_y=0; render_y<this->fw; render_y++){
+            for(int render_y=0; render_y<this->fh; render_y++){
                 for(int render_x=0; render_x<this->fw; render_x++){
                     const uint32_t pixel = pixels[render_y*this->fw+render_x];
                     win->graphics.pixel(render_x+this->fx, render_y+this->fy, pixel | 0xFF000000);
