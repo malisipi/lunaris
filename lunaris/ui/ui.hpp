@@ -271,16 +271,23 @@ namespace lunaris::ui {
             if(!this->is_hovering) this->vscrollbar->set_hovering(false);
         };
         void draw(lunaris::window* win, uint32_t* buffer){
-            win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
-            char the_text[this->text.size()+1];
-            sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-            win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, 0xFFFF0000);
-            // Vscrollbar 
-            this->vscrollbar->max = __how_many_char(this->text.c_str(), '\n');
-            this->vscrollbar->view = this->fh/20-1;
-            //TODO: Make sure value doesn't exceed max value: this->vscrollbar->value;
-            this->vscrollbar->__set_f_size(this->fx+this->fw-16, this->fy+0, 16, this->fh);
-            this->vscrollbar->draw(win, buffer);
+            if(this->multiline){
+                win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
+                char the_text[this->text.size()+1];
+                sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
+                win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, 0xFFFF0000);
+                // Vscrollbar 
+                this->vscrollbar->max = __how_many_char(this->text.c_str(), '\n');
+                this->vscrollbar->view = this->fh/20-1;
+                //TODO: Make sure value doesn't exceed max value: this->vscrollbar->value;
+                this->vscrollbar->__set_f_size(this->fx+this->fw-16, this->fy+0, 16, this->fh);
+                this->vscrollbar->draw(win, buffer);
+            } else {
+                win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
+                char the_text[this->text.size()+1];
+                sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
+                win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), the_text, 0xFFFF0000);
+            };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             // Vscrollbar
@@ -290,7 +297,11 @@ namespace lunaris::ui {
             };
             if(pressed){
                 win->focused = (void*)this;
-                this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, y, this->vscrollbar->value);
+                if(this->multiline){
+                    this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, y, this->vscrollbar->value);
+                } else {
+                    this->pos = win->graphics.font->get_clicking_pos(20, this->text.c_str(), x, -1, this->vscrollbar->value);
+                };
             };
         };
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
