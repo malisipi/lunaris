@@ -274,7 +274,6 @@ namespace lunaris::ui {
                 if(fraction != 0){ // TODO: Do it more accurate by rounding with `step` value
                     this->value -= fraction;
                 };
-                printf("%d\n", this->value);
                 if(!pressed && event != lunaris::mouse::motion){
                     this->is_clicked = false;
                 };
