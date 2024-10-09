@@ -175,7 +175,7 @@ namespace lunaris::ui {
                     };
                 }
             } else if(!this->horizontal){ // vertical
-                if(pressed){
+                if(pressed && event == lunaris::mouse::first){
                     if(y<18){
                         _scroll_up:
                         if(this->value>0){
@@ -206,7 +206,7 @@ namespace lunaris::ui {
                     };
                 };
             } else { // horizontal
-                if(pressed){
+                if(pressed && event == lunaris::mouse::first){
                     if(x<18){
                         _scroll_left:
                         if(this->value>0){
@@ -241,6 +241,48 @@ namespace lunaris::ui {
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
         }
     } scrollbar;
+
+    const uint32_t slider_id = request_new_id();
+    typedef struct slider:widget {
+        virtual uint32_t get_type(){
+            return slider_id;
+        };
+        int max = 1;
+        int min = 0;
+        int value = 0;
+        int step = 1;
+        bool horizontal = true;
+        bool is_clicked = false;
+        void draw(lunaris::window* win, uint32_t* buffer){
+            //win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFCCCCCC);
+            win->graphics.rounded_rect(this->fx+10, this->fy+this->fh/2-4, this->fw-20, 8, 4, 0xFF444444);
+            win->graphics.circle(this->fx+10+(this->value-this->min)*this->fw/(this->max-this->min+1), this->fy+this->fh/2, 10, 0xFFCCCCCC);
+        };
+        virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
+            if(pressed && event == lunaris::mouse::first){
+                this->is_clicked = true;
+            };
+
+            if(this->is_clicked){
+                const int click_point = x-10;
+                const int max_clickable_width = this->fw-20;
+                if(max_clickable_width<0 || this->min>=this->max) return;
+                int range = this->max-this->min+1;
+                this->value = this->min + click_point*range/max_clickable_width;
+                if(this->value>this->max) this->value = this->max;
+                int fraction = (this->value-this->min)%this->step;
+                if(fraction != 0){ // TODO: Do it more accurate by rounding with `step` value
+                    this->value -= fraction;
+                };
+                printf("%d\n", this->value);
+                if(!pressed && event != lunaris::mouse::motion){
+                    this->is_clicked = false;
+                };
+            }
+        };
+        virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
+        }
+    } slider;
 
     int __how_many_char(const char* text, char schar) {
         int count = 0;
