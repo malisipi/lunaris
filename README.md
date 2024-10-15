@@ -9,3 +9,5 @@
 - XDG protocols is licensed by MIT License. (Placed at `./thirdparty/xdg/`)
 - [Hackneyed X11 Cursors](https://gitlab.com/Enthymeme/hackneyed-x11-cursors) is licensed by [X11 License Distribution Modification Variant](./lunaris/thirdparty/hackneyed/LICENSE). (Placed at `./thirdparty/hackneyed/`)
 - [STB Libraries](https://github.com/nothings/stb) is licensed by [Public Domain](./lunaris/thirdparty/stb/LICENSE.txt). (Placed at `./thirdparty/stb/`)
+
+- Video widget is dependent to [libmpv](https://github.com/mpv-player/mpv/). See [GitHub page of libmpv](https://github.com/mpv-player/mpv/) to see License. This repository and project have not included any libmpv file.

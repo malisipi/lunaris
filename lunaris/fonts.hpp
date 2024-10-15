@@ -195,7 +195,7 @@ namespace lunaris {
                     if(text[i] == '\n') skip_lines--;
                     continue;
                 }
-                const bool is_on_clicked_line = pos_y < clicked_y && pos_y + line_height >= clicked_y;
+                const bool is_on_clicked_line =  (pos_y < clicked_y && pos_y + line_height >= clicked_y) || (clicked_y == -1);
                 if(text[i] == '\n'){ // It's multi-line hack shift
                     if(is_on_clicked_line){
                         return i;
