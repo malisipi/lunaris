@@ -1,13 +1,17 @@
 #include "./mpv_dynamic_loader.hpp"
 
+void poll_mpv_events (void* data);
+
 namespace lunaris::ui {
     const uint32_t video_id = request_new_id();
     typedef struct video:widget {
         virtual uint32_t get_type(){
             return video_id;
         };
+        bool _locked = false;
         mpv_handle* mpv_handle = NULL;
         mpv_render_context* mpv_context = NULL;
+        lunaris::window* _win = NULL; // TODO: Remove in future, it's ridiculous and unsafe
         video(){
             if(!_is_mpv_loaded){
                 _load_mpv();
@@ -27,7 +31,7 @@ namespace lunaris::ui {
                 {MPV_RENDER_PARAM_ADVANCED_CONTROL, &advanced_control},
                 {MPV_RENDER_PARAM_INVALID, NULL}
             };
-
+            dmpv_wakeup(this->mpv_handle);
             if(dmpv_render_context_create(&this->mpv_context, this->mpv_handle, params) < 0){
                 printf("dmpv_render_context_create failed\n");
                 return;
@@ -45,6 +49,7 @@ namespace lunaris::ui {
             dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
         };
         void draw(lunaris::window* win, uint32_t* buffer){
+            if(this->_win == NULL) this->_win = win;
             const int resolution[2] = {this->fw, this->fh};
             const int pitch = this->fw*4;
             uint32_t pixels[(this->fw+24)*(this->fh+24)];
@@ -61,6 +66,14 @@ namespace lunaris::ui {
                 return;
             };
 
+            if(!this->_locked){
+                dmpv_set_wakeup_callback(this->mpv_handle, poll_mpv_events, (void*)this);
+            };
+            //poll_mpv_events((void*)this);
+
+            dmpv_observe_property(this->mpv_handle, 0, "duration", MPV_FORMAT_DOUBLE);
+            dmpv_observe_property(this->mpv_handle, 0, "time-pos", MPV_FORMAT_DOUBLE);
+
             for(int render_y=0; render_y<this->fh; render_y++){
                 for(int render_x=0; render_x<this->fw; render_x++){
                     const uint32_t pixel = pixels[render_y*this->fw+render_x];
@@ -72,3 +85,23 @@ namespace lunaris::ui {
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){};
     } video;
 }
+
+void poll_mpv_events (void* widget_ptr){
+    lunaris::ui::video* widget = (lunaris::ui::video*)widget_ptr;
+    if(widget->_locked) return;
+    widget->_locked = true;
+    mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
+    if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
+        struct mpv_event_property* prop = (struct mpv_event_property*)event->data;
+        if(strcmp(prop->name, "time-pos") == 0){
+            if(prop->format == MPV_FORMAT_DOUBLE){
+                //printf("Time-pos: %f\n", *((double*)(prop->data)));
+            };
+        } else if(strcmp(prop->name, "duration") == 0){
+            if(prop->format == MPV_FORMAT_DOUBLE){
+                //printf("Duration: %f\n", *((double*)(prop->data)));
+            };
+        };
+    };
+    widget->_locked = false;
+};
