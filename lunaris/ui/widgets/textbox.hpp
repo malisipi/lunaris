@@ -14,6 +14,7 @@ namespace lunaris::ui {
             return textbox_id;
         };
         std::string text = "";
+        std::string placeholder = "";
         bool multiline = false;
         uint64_t pos = 0;
         scrollbar* vscrollbar = NULL;
@@ -27,12 +28,16 @@ namespace lunaris::ui {
             this->is_hovering = is_hovering;
             if(!this->is_hovering) this->vscrollbar->set_hovering(false);
         };
-        void draw(lunaris::window* win, uint32_t* buffer){
+        void(*submit_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
+        // Only available at non-multiline textbox.
+        // This event will only fired when clicked enter
+        void draw(lunaris::window* win, uint32_t* buffer){ // TODO: Fix text cursor
             if(this->multiline){
                 win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
+                // TODO: Support placeholder
                 char the_text[this->text.size()+1];
                 sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-                win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, 0xFFFF0000);
+                win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, 0xFF000000);
                 // Vscrollbar 
                 this->vscrollbar->max = __how_many_char(this->text.c_str(), '\n');
                 this->vscrollbar->view = this->fh/20-1;
@@ -41,9 +46,14 @@ namespace lunaris::ui {
                 this->vscrollbar->draw(win, buffer);
             } else {
                 win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
-                char the_text[this->text.size()+1];
-                sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-                win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), the_text, 0xFFFF0000);
+                if(this->text != ""){
+                    char the_text[this->text.size()+1];
+                    sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
+                    win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), the_text, 0xFF000000);
+                } else {
+                    win->graphics.text(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), 0xFF444444);
+                    win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), "¦", 0xFF000000);
+                }
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
@@ -68,7 +78,13 @@ namespace lunaris::ui {
                 if(this->pos<0) this->pos = 0;
 
                 if(key == keycode::enter || key == keycode::np_enter){
-                    if(this->multiline) this->text.insert(this->pos++, "\n");
+                    if(this->multiline){
+                        this->text.insert(this->pos++, "\n");
+                    } else {
+                        if(this->submit_handler != NULL){
+                            this->submit_handler(win, this);
+                        };
+                    };
                 } else if(key == keycode::backspace){
                     if(this->pos>0) this->text.erase(--this->pos, 1); // TODO: Support Unicode UTF-8
                 } else if(key == keycode::arrow_left){

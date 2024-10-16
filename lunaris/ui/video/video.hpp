@@ -8,10 +8,12 @@ namespace lunaris::ui {
         virtual uint32_t get_type(){
             return video_id;
         };
-        bool _locked = false;
         mpv_handle* mpv_handle = NULL;
         mpv_render_context* mpv_context = NULL;
         lunaris::window* _win = NULL; // TODO: Remove in future, it's ridiculous and unsafe
+        int _event_pooled_timer = 0;
+        void(*time_pos_update_handler)(lunaris::window*, lunaris::ui::widget*, double) = NULL;
+        void(*duration_update_handler)(lunaris::window*, lunaris::ui::widget*, double) = NULL;
         video(){
             if(!_is_mpv_loaded){
                 _load_mpv();
@@ -66,10 +68,7 @@ namespace lunaris::ui {
                 return;
             };
 
-            if(!this->_locked){
-                dmpv_set_wakeup_callback(this->mpv_handle, poll_mpv_events, (void*)this);
-            };
-            //poll_mpv_events((void*)this);
+            if(this->_event_pooled_timer++%5==0) poll_mpv_events((void*)this);
 
             dmpv_observe_property(this->mpv_handle, 0, "duration", MPV_FORMAT_DOUBLE);
             dmpv_observe_property(this->mpv_handle, 0, "time-pos", MPV_FORMAT_DOUBLE);
@@ -88,20 +87,25 @@ namespace lunaris::ui {
 
 void poll_mpv_events (void* widget_ptr){
     lunaris::ui::video* widget = (lunaris::ui::video*)widget_ptr;
-    if(widget->_locked) return;
-    widget->_locked = true;
-    mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
-    if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
-        struct mpv_event_property* prop = (struct mpv_event_property*)event->data;
-        if(strcmp(prop->name, "time-pos") == 0){
-            if(prop->format == MPV_FORMAT_DOUBLE){
-                //printf("Time-pos: %f\n", *((double*)(prop->data)));
-            };
-        } else if(strcmp(prop->name, "duration") == 0){
-            if(prop->format == MPV_FORMAT_DOUBLE){
-                //printf("Duration: %f\n", *((double*)(prop->data)));
+    for(;;){
+        mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
+        if(event->event_id == MPV_EVENT_NONE) break;
+
+        if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
+            struct mpv_event_property* prop = (struct mpv_event_property*)event->data;
+            if(strcmp(prop->name, "time-pos") == 0){
+                if(prop->format == MPV_FORMAT_DOUBLE){
+                    if(widget->time_pos_update_handler != NULL){
+                        widget->time_pos_update_handler(widget->_win, widget, *((double*)(prop->data)));
+                    };
+                };
+            } else if(strcmp(prop->name, "duration") == 0){
+                if(prop->format == MPV_FORMAT_DOUBLE){
+                    if(widget->duration_update_handler != NULL){
+                        widget->duration_update_handler(widget->_win, widget, *((double*)(prop->data)));
+                    };
+                };
             };
         };
     };
-    widget->_locked = false;
 };
