@@ -20,8 +20,10 @@ namespace lunaris::ui {
             const int items_size = this->items.size();
             win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
             for(int text_y=0;text_y<items_size;text_y++){
-                win->graphics.rounded_rect_empty(this->fx, this->fy+30*text_y-30*this->vscrollbar->value, this->fw-16, 30, 5, 1, 0xFF000000);
-                win->graphics.text(this->fx+4, this->fy+5+30*text_y-30*this->vscrollbar->value, 20, this->items[text_y].c_str(), 0xFF000000);
+                const int relative_y = 30*text_y-30*this->vscrollbar->value;
+                if(relative_y<0 || relative_y>this->fh) continue;
+                win->graphics.rounded_rect_empty(this->fx, this->fy+relative_y, this->fw-16, 30, 5, 1, 0xFF000000);
+                win->graphics.text(this->fx+4, this->fy+5+relative_y, 20, this->items[text_y].c_str(), 0xFF000000);
             };
             // Vscrollbar 
             this->vscrollbar->max = items_size;
