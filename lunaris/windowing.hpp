@@ -53,7 +53,7 @@
 #include <string.h>
 #endif
 
-#include "__internal.h"
+#include "internal.hpp"
 
 #include "fonts.hpp"
 #include "images.hpp"
