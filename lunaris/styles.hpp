@@ -21,6 +21,10 @@ namespace lunaris::styles {
                     return rgb;
                 };
             };
+        #elifdef _WIN32
+        uint32_t color_abgr = 0;
+        lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\DWM", (char*)"AccentColor", &color_abgr);
+        rgb = {(uint8_t)(color_abgr & 0xFF), (uint8_t)((color_abgr>>8)&0xFF), (uint8_t)((color_abgr>>16)&0xFF)};
         #endif
         return rgb;
     };

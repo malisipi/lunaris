@@ -53,6 +53,8 @@
 #include <string.h>
 #endif
 
+#include "__internal.h"
+
 #include "fonts.hpp"
 #include "images.hpp"
 
