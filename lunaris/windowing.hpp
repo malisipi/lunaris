@@ -57,6 +57,7 @@
 
 #include "fonts.hpp"
 #include "images.hpp"
+#include "styles.hpp"
 
 namespace lunaris {
     typedef struct window window;
@@ -473,6 +474,7 @@ namespace lunaris {
     #ifdef LUNARIS_UI
         void* layout = NULL;
         void* focused = NULL;
+        lunaris::styles::color_palette* colors = NULL;
     #endif
     };
 

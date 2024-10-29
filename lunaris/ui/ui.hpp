@@ -91,7 +91,7 @@ namespace lunaris::ui {
     }
 
     void draw_handler(lunaris::window* win, uint32_t* buffer){
-        win->graphics.rect(0, 0, win->width, win->height, 0xFFFAFAFA);
+        win->graphics.rect(0, 0, win->width, win->height, win->colors->background_color);
 
         lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
         layout->__set_f_size(0, 0, win->width, win->height);
@@ -111,7 +111,8 @@ namespace lunaris::ui {
         if(win->focused != NULL) ((lunaris::ui::widget*)win->focused)->keyboard_handler(win, new_char, key, modifiers, event);
     };
 
-    void assign_handlers(lunaris::window* win){
+    void connect(lunaris::window* win){
+        win->colors = lunaris::styles::generate_color_palette_from_system();
         win->draw_handler = lunaris::ui::draw_handler;
         win->mouse_handler = lunaris::ui::mouse_handler;
         win->keyboard_handler = lunaris::ui::keyboard_handler;

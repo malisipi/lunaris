@@ -16,25 +16,25 @@ namespace lunaris::ui {
         void draw(lunaris::window* win, uint32_t* buffer){
             if(this->view < this->max){
                 if(!this->horizontal){ // vertical
-                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, 0xFFF1F1F1);
-                    if(this->is_hovering && this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy, this->fw, 16, 5, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+4, 8, 8, 0xFFA0A0A0);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
+                    if(this->is_hovering && this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy, this->fw, 16, 5, win->colors->hover_color);
+                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+4, 8, 8, win->colors->text_color);
                     float size = (float)(this->fh-36)/(float)(this->max);
-                    uint32_t hovered_color = 0xFFC0C0C0;
-                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_y) && ((18+size*this->value+size*this->view)>this->_mouse_y)) hovered_color = 0xFFA0A0A0;
+                    uint32_t hovered_color = win->colors->other_color;
+                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_y) && ((18+size*this->value+size*this->view)>this->_mouse_y)) hovered_color = win->colors->hover_color;
                     win->graphics.rounded_rect(this->fx, this->fy+18+size*this->value, this->fw, size*this->view, 5, hovered_color);
-                    if(this->is_hovering && this->fh-this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy+this->fh-16, this->fw, 16, 5, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+this->fh-12, 8, 8, 0xFFA0A0A0);
+                    if(this->is_hovering && this->fh-this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy+this->fh-16, this->fw, 16, 5, win->colors->other_color);
+                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+this->fh-12, 8, 8, win->colors->text_color);
                 } else { // horizontal
-                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, 0xFFF1F1F1);
-                    if(this->is_hovering && this->_mouse_x<16) win->graphics.rounded_rect(this->fx, this->fy, 16, this->fh, 5, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx+4, this->fy+this->fh/2-4, 8, 8, 0xFFA0A0A0);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
+                    if(this->is_hovering && this->_mouse_x<16) win->graphics.rounded_rect(this->fx, this->fy, 16, this->fh, 5, win->colors->hover_color);
+                    win->graphics.rect(this->fx+4, this->fy+this->fh/2-4, 8, 8, win->colors->text_color);
                     float size = (float)(this->fw-36)/(float)(this->max);
-                    uint32_t hovered_color = 0xFFC0C0C0;
-                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_x) && ((18+size*this->value+size*this->view)>this->_mouse_x)) hovered_color = 0xFFA0A0A0;
+                    uint32_t hovered_color = win->colors->other_color;
+                    if(this->is_hovering && ((18+size*this->value)<this->_mouse_x) && ((18+size*this->value+size*this->view)>this->_mouse_x)) hovered_color = win->colors->hover_color;
                     win->graphics.rounded_rect(this->fx+18+size*this->value, this->fy, size*this->view, this->fh, 5, hovered_color);
-                    if(this->is_hovering && this->fw-this->_mouse_x<16) win->graphics.rounded_rect(this->fx+this->fw-16, this->fy, 16, this->fh, 5, 0xFFCCCCCC);
-                    win->graphics.rect(this->fx+this->fw-12, this->fy+this->fh/2-4, 8, 8, 0xFFA0A0A0);
+                    if(this->is_hovering && this->fw-this->_mouse_x<16) win->graphics.rounded_rect(this->fx+this->fw-16, this->fy, 16, this->fh, 5, win->colors->other_color);
+                    win->graphics.rect(this->fx+this->fw-12, this->fy+this->fh/2-4, 8, 8, win->colors->text_color);
                 };
             };
         };

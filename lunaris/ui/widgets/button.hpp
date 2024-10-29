@@ -6,10 +6,10 @@ namespace lunaris::ui {
         };
         std::string text = "";
         void draw(lunaris::window* win, uint32_t* buffer){
-            win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, 0xFFE6E6E6);
+            win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, win->colors->other_color);
             const int text_line_height = std::min(this->fh, 20);
             std::pair<int, int> text_size = win->graphics.text_bounding_area(text_line_height, this->text.c_str());
-            win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), 0xFF000000);
+            win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), win->colors->text_color);
         };
         void(*click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
         void(*double_click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
