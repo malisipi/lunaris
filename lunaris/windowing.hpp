@@ -11,7 +11,7 @@
 #include <math.h>
 #include <vector>
 
-#if !(defined(windows) || defined(wayland) || defined(x11) || defined(haiku))
+#if !(defined(windows) || defined(wayland) || defined(x11) || defined(haiku) || defined(framebuffer))
     #ifdef _WIN32
     #define windows
     #endif
@@ -469,7 +469,10 @@ namespace lunaris {
         uint32_t __last_pressed_key = 0;
     #endif
     #ifdef haiku
-        void* bwindow = NULL;
+        void* __bwindow = NULL;
+    #endif
+    #ifdef framebuffer
+        void* __buffer = NULL;
     #endif
     #ifdef LUNARIS_UI
         void* layout = NULL;
@@ -481,17 +484,21 @@ namespace lunaris {
 };
 
 #ifdef wayland
-#include "wayland.hpp"
+#include "backends/wayland/wayland.hpp"
 #endif
 
 #ifdef x11
-#include "x11.hpp"
+#include "backends/x11/x11.hpp"
 #endif
 
 #ifdef windows
-#include "windows.hpp"
+#include "backends/windows/windows.hpp"
 #endif
 
 #ifdef haiku
-#include "haiku.hpp"
+#include "backends/haiku/haiku.hpp"
+#endif
+
+#ifdef framebuffer
+#include "backends/framebuffer/framebuffer.hpp"
 #endif

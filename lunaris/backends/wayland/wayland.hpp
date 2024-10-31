@@ -9,16 +9,16 @@ namespace lunaris {
     struct xkb_keymap* __xkb_keymap = NULL;
     struct xkb_state* __xkb_state = NULL;
 
-    // xdg
     #include </usr/include/linux/input-event-codes.h>
-    #include "thirdparty/xdg/xdg-shell.h"
-    #include "thirdparty/xdg/xdg-decoration-unstable-v1-client-protocol.h"
-    #include "thirdparty/xdg/cursor-shape-v1.h"
-    #include "thirdparty/xdg/tablet-v2.h"
-    #include "thirdparty/xdg/xdg-shell.c"
-    #include "thirdparty/xdg/xdg-decoration-unstable-v1-client-protocol.c"
-    #include "thirdparty/xdg/cursor-shape-v1.c"
-    #include "thirdparty/xdg/tablet-v2.c"
+    // xdg
+    #include "../../thirdparty/xdg/xdg-shell.h"
+    #include "../../thirdparty/xdg/xdg-decoration-unstable-v1-client-protocol.h"
+    #include "../../thirdparty/xdg/cursor-shape-v1.h"
+    #include "../../thirdparty/xdg/tablet-v2.h"
+    #include "../../thirdparty/xdg/xdg-shell.c"
+    #include "../../thirdparty/xdg/xdg-decoration-unstable-v1-client-protocol.c"
+    #include "../../thirdparty/xdg/cursor-shape-v1.c"
+    #include "../../thirdparty/xdg/tablet-v2.c"
 
     #define COLOR_CHANNELS 4
     #define SHM_POOL_SIZE (1920*COLOR_CHANNELS*1080*4)
