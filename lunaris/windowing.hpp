@@ -11,7 +11,7 @@
 #include <math.h>
 #include <vector>
 
-#if !(defined(windows) || defined(wayland) || defined(x11) || defined(haiku) || defined(framebuffer))
+#if !(defined(windows) || defined(wayland) || defined(x11) || defined(haiku) || defined(framebuffer) || defined(emscripten))
     #ifdef _WIN32
     #define windows
     #endif
@@ -22,6 +22,10 @@
 
     #ifdef __HAIKU__
     #define haiku
+    #endif
+
+    #ifdef __EMSCRIPTEN__
+    #define emscripten
     #endif
 #endif
 
@@ -51,6 +55,11 @@
 #include <GraphicsDefs.h>
 #include <Message.h>
 #include <string.h>
+#endif
+
+#ifdef emscripten
+#include <emscripten.h>
+#include <emscripten/html5.h>
 #endif
 
 #include "internal.hpp"
@@ -471,7 +480,7 @@ namespace lunaris {
     #ifdef haiku
         void* __bwindow = NULL;
     #endif
-    #ifdef framebuffer
+    #if defined(framebuffer) || defined(emscripten)
         void* __buffer = NULL;
     #endif
     #ifdef LUNARIS_UI
@@ -501,4 +510,8 @@ namespace lunaris {
 
 #ifdef framebuffer
 #include "backends/framebuffer/framebuffer.hpp"
+#endif
+
+#ifdef emscripten
+#include "backends/emscripten/emscripten.hpp"
 #endif

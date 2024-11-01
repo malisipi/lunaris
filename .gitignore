@@ -10,3 +10,4 @@ lunaris/x11.hpp
 *.dll
 *.so
 libmpv
+web

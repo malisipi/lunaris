@@ -62,7 +62,7 @@ namespace lunaris::styles {
     };
 
     uint32_t get_system_color(){
-        #ifdef linux
+        #if defined(linux)
             char kdeglobals_path[4096];
             sprintf(kdeglobals_path, "%s/.config/kdeglobals", getenv("HOME"));
             FILE* kdeglobals = fopen(kdeglobals_path, "r");
@@ -83,16 +83,35 @@ namespace lunaris::styles {
                     return 0xFF000000 | (rgb[0]<<16) | (rgb[1]<<8) | (rgb[2]);
                 };
             };
-        #elifdef _WIN32
-        uint32_t color_abgr = 0;
-        lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\DWM", (char*)"AccentColor", &color_abgr);
-        if(color_abgr == 0) return 0x00000000;
-        return 0xFF000000 | (color_abgr & 0x0000FF00) | ((color_abgr<<16) & 0x00FF0000) | ((color_abgr>>16) & 0x000000FF);
+        #elif defined(_WIN32)
+            uint32_t color_abgr = 0;
+            lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\DWM", (char*)"AccentColor", &color_abgr);
+            if(color_abgr == 0) return 0x00000000;
+            return 0xFF000000 | (color_abgr & 0x0000FF00) | ((color_abgr<<16) & 0x00FF0000) | ((color_abgr>>16) & 0x000000FF);
+        #elif defined(__EMSCRIPTEN__)
+            return 0xFF000000 | EM_ASM_INT({
+                let calculator_element = document.createElement("div");
+                calculator_element.style.setProperty("color", "highlight");
+                document.body.append(calculator_element);
+                let computed_style = window.getComputedStyle(calculator_element) ;
+                let accent_color = computed_style.getPropertyValue("color").match(/[0-9]+/g).slice(0,3).map(a=>Number(a));
+                calculator_element.remove();
+                return (accent_color[2]<<16) | (accent_color[1]<<8) | accent_color[0];
+            });
         #endif
         return 0x00000000;
     };
 
+    bool is_system_theme_light(){
+        #if defined(__EMSCRIPTEN__)
+            return EM_ASM_({
+                return (!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
+            });
+        #endif
+        return true;
+    }
+
     color_palette* generate_color_palette_from_system(){
-        return generate_color_palette(true, get_system_color()); // TODO: Get system light/dark prefence.
+        return generate_color_palette(is_system_theme_light(), get_system_color()); // TODO: Get system light/dark prefence.
     };
 };
