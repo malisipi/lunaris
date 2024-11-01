@@ -67,7 +67,7 @@ namespace lunaris {
 		emscripten_set_mousemove_callback("#canvas", (void*)win, 1, mousemove_handler);
 		emscripten_set_mouseup_callback("#canvas", (void*)win, 1, mouseup_handler);
 		emscripten_set_keypress_callback("#canvas", (void*)win, 1, keypress_handler);
-		emscripten_set_resize_callback("#canvas", (void*)win, 1, resize_handler);
+		emscripten_set_resize_callback(EMSCRIPTEN_EVENT_TARGET_WINDOW, (void*)win, 1, resize_handler);
 
 		win->buffer = (uint32_t*)malloc(1920*1080*4);
 
