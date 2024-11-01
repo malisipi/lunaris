@@ -89,7 +89,7 @@ namespace lunaris::styles {
             if(color_abgr == 0) return 0x00000000;
             return 0xFF000000 | (color_abgr & 0x0000FF00) | ((color_abgr<<16) & 0x00FF0000) | ((color_abgr>>16) & 0x000000FF);
         #elif defined(__EMSCRIPTEN__)
-            return 0xFF000000 | EM_ASM_INT({
+            uint32_t color = 0xFF000000 | EM_ASM_INT({
                 let calculator_element = document.createElement("div");
                 calculator_element.style.setProperty("color", "highlight");
                 document.body.append(calculator_element);
@@ -98,6 +98,10 @@ namespace lunaris::styles {
                 calculator_element.remove();
                 return (accent_color[2]<<16) | (accent_color[1]<<8) | accent_color[0];
             });
+            if(color == 0xFFC64100 /* Chrome */ || color == 0xFFE48434 /* Safari (aka Webkit) */) { // It's browsers default highlight color, so it's not a accent color. It's pre-defined color to reduce fingerprint.
+                return 0x00000000;
+            };
+            return color;
         #endif
         return 0x00000000;
     };
