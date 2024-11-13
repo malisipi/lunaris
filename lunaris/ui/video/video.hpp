@@ -50,6 +50,11 @@ namespace lunaris::ui {
         void pause(){
             dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
         };
+        void set_time_pos(int time_pos){
+            char time_pos_str[12];
+            sprintf(time_pos_str, "%d", time_pos);
+            dmpv_set_property_string(this->mpv_handle, "time-pos", time_pos_str);
+        };
         void draw(lunaris::window* win, uint32_t* buffer){
             if(this->_win == NULL) this->_win = win;
             const int resolution[2] = {this->fw, this->fh};
