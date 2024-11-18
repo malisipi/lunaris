@@ -46,6 +46,7 @@ namespace lunaris {
     typedef struct font {
         unsigned char* font_buffer;
         stbtt_fontinfo info;
+        lunaris::font* fallback_font = NULL;
         uint32_t __get_glyph_from_text(uint64_t* i, const char* text){ // https://en.wikipedia.org/wiki/UTF-8
             if(i == NULL) return 0;
             if((text[*i]&0x80) == 0){ // 1 char unicode (a)
@@ -80,6 +81,7 @@ namespace lunaris {
                     pos_x = text_start_x;
                     // pos_x = text_start_x + line_height/3; // For italic
                     pos_y += line_height;
+                    continue;
                 };
 
                 if(buffer_height<=pos_y) return; // If potantial-area finished, return. Cannot write buffer
@@ -89,7 +91,10 @@ namespace lunaris {
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(the_glyph == 0) continue;
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
-                    //printf("The glyph is not exist on this font!\n");
+                    if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
+                        this->fallback_font->draw_glyph(buffer, buffer_width, buffer_height, pos_x, pos_y, line_height, the_glyph, color);
+                        pos_x += this->fallback_font->glyph_width(line_height, the_glyph);
+                    };
                     continue;
                 };
 
@@ -159,7 +164,9 @@ namespace lunaris {
 
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
-                    //printf("The glyph is not exist on this font!\n");
+                    if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
+                        pos_x += this->fallback_font->glyph_width(line_height, the_glyph);
+                    };
                     continue;
                 };
 
@@ -176,6 +183,74 @@ namespace lunaris {
                 if(pos_x>text_width) text_width = pos_x;
             };
             return std::make_pair(text_width, text_height);
+        };
+        void draw_glyph(uint32_t* buffer, const int buffer_width, const int buffer_height, const int text_start_x, int text_start_y, const int line_height, const uint32_t the_glyph, uint32_t color){
+            float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
+
+            int ascent, descent, line_gap;
+            stbtt_GetFontVMetrics(&this->info, &ascent, &descent, &line_gap);
+            ascent *= scale;
+            descent *= scale;
+            line_gap *= scale;
+
+            if(buffer_height<=text_start_y) return; // If potantial-area finished, return. Cannot write buffer
+            if(buffer_width<=text_start_x) return; // Exceed width, skip until new line
+            if(text_start_y<0 || text_start_x < 0) return; // TODO: Top-left border cutting is not good. Will skip char atm. Fix it to render correctly later.
+
+            if(the_glyph == 0) return;
+            if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
+                if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
+                    this->fallback_font->draw_glyph(buffer, buffer_width, buffer_height, text_start_x, text_start_y, line_height, the_glyph, color);
+                };
+                return;
+            };
+
+            int advance_width;
+            int left_side_bearing;
+            stbtt_GetCodepointHMetrics(&this->info, the_glyph, &advance_width, &left_side_bearing);
+            advance_width *= scale;
+            left_side_bearing *= scale;
+
+            int ix0, iy0, ix1, iy1;
+            stbtt_GetCodepointBitmapBox(&this->info, the_glyph, scale, scale, &ix0, &iy0, &ix1, &iy1);
+            int char_y = text_start_y + ascent + iy0;
+
+            int bitmap_w = 0;
+            int bitmap_h = 0;
+
+            unsigned char* the_char = stbtt_GetGlyphBitmapSubpixel(&this->info, scale, scale, 0.0f, 0.0f, stbtt_FindGlyphIndex(&info, the_glyph), &bitmap_w, &bitmap_h, 0, 0);
+            int bitmap_stride = bitmap_w;
+
+            if(buffer_height<=bitmap_h+char_y){
+                bitmap_h = buffer_height-char_y;
+            };
+            if(buffer_width<=text_start_x+bitmap_w+left_side_bearing){
+                bitmap_w = buffer_width-text_start_x-left_side_bearing;
+            };
+            for(int bitmap_y=0; bitmap_y<bitmap_h; bitmap_y++){
+                for(int bitmap_x=0; bitmap_x<bitmap_w; bitmap_x++){
+                    int target_byte = (bitmap_y+char_y)*buffer_width + bitmap_x + left_side_bearing + text_start_x;
+                    buffer[target_byte] = color_mix(buffer[target_byte], color, (float)the_char[bitmap_stride*bitmap_y + bitmap_x]/(float)255);
+                };
+            };
+            free(the_char);
+        };
+        int glyph_width(const int line_height, const uint32_t the_glyph){
+            float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
+
+            if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
+                if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
+                    return this->fallback_font->glyph_width(line_height, the_glyph);
+                };
+                return 0;
+            };
+
+            int advance_width;
+            int left_side_bearing;
+            stbtt_GetCodepointHMetrics(&this->info, the_glyph, &advance_width, &left_side_bearing);
+            advance_width *= scale;
+
+            return advance_width;
         };
         uint64_t get_clicking_pos(const int line_height, const char* text, float clicked_xf, float clicked_yf, int skip_lines){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
@@ -211,7 +286,9 @@ namespace lunaris {
 
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
-                    //printf("The glyph is not exist on this font!\n");
+                    if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
+                        pos_x += this->fallback_font->glyph_width(line_height, the_glyph);
+                    };
                     continue;
                 };
 
