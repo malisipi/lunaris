@@ -18,23 +18,45 @@ namespace lunaris::ui {
                 if(!this->horizontal){ // vertical
                     win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
                     if(this->is_hovering && this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy, this->fw, 16, 5, win->colors->hover_color);
-                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+4, 8, 8, win->colors->text_color);
+
+                    // upper-thumb - [size: x: (this->fx+this->fw/2-4) | y: (this->fy+4) | w: 8 | h: 6(+2padding)]
+                    win->graphics.triangle((this->fx+this->fw/2-4)+4, (this->fy+4),
+                                                (this->fx+this->fw/2-4), (this->fy+4)+6,
+                                                (this->fx+this->fw/2-4)+8, (this->fy+4)+6,
+                                                win->colors->text_color);
+
                     float size = (float)(this->fh-36)/(float)(this->max);
                     uint32_t hovered_color = win->colors->other_color;
                     if(this->is_hovering && ((18+size*this->value)<this->_mouse_y) && ((18+size*this->value+size*this->view)>this->_mouse_y)) hovered_color = win->colors->hover_color;
                     win->graphics.rounded_rect(this->fx, this->fy+18+size*this->value, this->fw, size*this->view, 5, hovered_color);
                     if(this->is_hovering && this->fh-this->_mouse_y<16) win->graphics.rounded_rect(this->fx, this->fy+this->fh-16, this->fw, 16, 5, win->colors->other_color);
-                    win->graphics.rect(this->fx+this->fw/2-4, this->fy+this->fh-12, 8, 8, win->colors->text_color);
+
+                    // lower-thumb - [size: x: (this->fx+this->fw/2-4) | y: (this->fy+this->fh-12) | w: 8 | h: (2padding+)6]
+                    win->graphics.triangle((this->fx+this->fw/2-4)+4, (this->fy+this->fh-12)+6+2,
+                                                (this->fx+this->fw/2-4), (this->fy+this->fh-12)+2,
+                                                (this->fx+this->fw/2-4)+8, (this->fy+this->fh-12)+2,
+                                                win->colors->text_color);
                 } else { // horizontal
                     win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
                     if(this->is_hovering && this->_mouse_x<16) win->graphics.rounded_rect(this->fx, this->fy, 16, this->fh, 5, win->colors->hover_color);
-                    win->graphics.rect(this->fx+4, this->fy+this->fh/2-4, 8, 8, win->colors->text_color);
+
+                    // left-thumb - [size: x: (this->fx+4) | y: (this->fy+this->fh/2-4) | w: 6 | h: 8]
+                    win->graphics.triangle((this->fx+4), (this->fy+this->fh/2-4)+4,
+                                                (this->fx+4)+6, (this->fy+this->fh/2-4),
+                                                (this->fx+4)+6, (this->fy+this->fh/2-4)+8,
+                                                win->colors->text_color);
+
                     float size = (float)(this->fw-36)/(float)(this->max);
                     uint32_t hovered_color = win->colors->other_color;
                     if(this->is_hovering && ((18+size*this->value)<this->_mouse_x) && ((18+size*this->value+size*this->view)>this->_mouse_x)) hovered_color = win->colors->hover_color;
                     win->graphics.rounded_rect(this->fx+18+size*this->value, this->fy, size*this->view, this->fh, 5, hovered_color);
                     if(this->is_hovering && this->fw-this->_mouse_x<16) win->graphics.rounded_rect(this->fx+this->fw-16, this->fy, 16, this->fh, 5, win->colors->other_color);
-                    win->graphics.rect(this->fx+this->fw-12, this->fy+this->fh/2-4, 8, 8, win->colors->text_color);
+
+                    // right-thumb - [size: x: (this->fx+this->fw-12) | y: (this->fy+this->fh/2-4) | w: 6 | h: 8]
+                    win->graphics.triangle((this->fx+this->fw-12), (this->fy+this->fh/2-4),
+                                           (this->fx+this->fw-12), (this->fy+this->fh/2-4)+8,
+                                           (this->fx+this->fw-12)+6, (this->fy+this->fh/2-4)+4,
+                                           win->colors->text_color);
                 };
             };
         };

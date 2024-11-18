@@ -398,6 +398,47 @@ namespace lunaris {
                 this->__partial_circle_outline(x+radius, y+h-radius, radius, true, false, thickness, color);
                 this->__partial_circle_outline(x+w-radius, y+h-radius, radius, false, false, thickness, color);
             };
+            void triangle_empty(int x0, int y0, int x1, int y1, int x2, int y2, int thickness, uint32_t color){
+                this->line_thick(x0, y0, x1, y1, thickness, color);
+                this->line_thick(x0, y0, x2, y2, thickness, color);
+                this->line_thick(x1, y1, x2, y2, thickness, color);
+            };
+            void triangle(int x0, int y0, int x1, int y1, int x2, int y2, uint32_t color){
+                if (y0 > y1) {
+                    std::swap(x0, x1);
+                    std::swap(y0, y1);
+                };
+                if (y0 > y2) {
+                    std::swap(x0, x2);
+                    std::swap(y0, y2);
+                };
+                if (y1 > y2) {
+                    std::swap(x1, x2);
+                    std::swap(y1, y2);
+                };
+
+                if (y1 != y0) {
+                    for (int yi = y0; yi <= y1; yi++) {
+                        int x_start = x0 + (x1 - x0) * (yi - y0) / (y1 - y0);
+                        int x_end = x0 + (x2 - x0) * (yi - y0) / (y2 - y0);
+                        if (x_start > x_end) std::swap(x_start, x_end);
+                        for (int xi = x_start; xi <= x_end; xi++){
+                            this->pixel(xi, yi, color);
+                        };
+                    };
+                };
+
+                if (y2 != y1) {
+                    for (int yi = y1; yi <= y2; yi++) {
+                        int x_start = x1 + (x2 - x1) * (yi - y1) / (y2 - y1);
+                        int x_end = x0 + (x2 - x0) * (yi - y0) / (y2 - y0);
+                        if (x_start > x_end) std::swap(x_start, x_end);
+                        for (int xi = x_start; xi <= x_end; xi++){
+                            this->pixel(xi, yi, color);
+                        };
+                    };
+                };
+            };
             void poly_empty(std::vector<std::vector<int>> list, int thickness, uint32_t color){
                 const int len = list.size();
                 for(int i=0;i<len-1;i++){
