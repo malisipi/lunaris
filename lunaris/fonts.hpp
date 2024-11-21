@@ -63,7 +63,7 @@ namespace lunaris {
                 return 0;
             };
         };
-        void draw_text(uint32_t* buffer, const int buffer_width, const int buffer_height, const int text_start_x, int text_start_y, const int line_height, const char* text, uint32_t color){
+        void draw_text_with_cursor(uint32_t* buffer, const int buffer_width, const int buffer_height, const int text_start_x, int text_start_y, const int line_height, const char* text, uint32_t color, uint64_t cursor_pos, uint32_t cursor_color){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
             
             int pos_x = text_start_x;
@@ -76,7 +76,25 @@ namespace lunaris {
             descent *= scale;
             line_gap *= scale;
             
+            auto draw_cursor = [&](){
+                if(cursor_pos == -1) return;
+                if(pos_x>-1 && pos_x+1<buffer_width){
+                    pos_x += 2; // for padding
+                    for(int y=0; y<line_height;y++){
+                        if(pos_y+y>-1 && pos_y+y<buffer_height){
+                            buffer[buffer_width*(pos_y+y)+pos_x] = cursor_color;
+                            buffer[buffer_width*(pos_y+y)+pos_x+1] = cursor_color;
+                        };
+                    };
+                    pos_x += 2; // for cursor width
+                    pos_x += 2; // for padding
+                };
+            };
+
             for (uint64_t i = 0; i < strlen(text); i++){
+                if(i == cursor_pos){
+                    draw_cursor();
+                };
                 if(text[i] == '\n'){ // It's multi-line hack shift
                     pos_x = text_start_x;
                     // pos_x = text_start_x + line_height/3; // For italic
@@ -140,6 +158,10 @@ namespace lunaris {
                 /*int kern = stbtt_GetCodepointKernAdvance(&this->info, the_glyph, text[i + 1]); // TODO: multi-char unicodes will change i, not safe for those function calls, please fix it.
                 pos_x += kern * scale;*/
             };
+            if(cursor_pos >= strlen(text)) draw_cursor();
+        };
+        void draw_text(uint32_t* buffer, const int buffer_width, const int buffer_height, const int text_start_x, int text_start_y, const int line_height, const char* text, uint32_t color){
+            draw_text_with_cursor(buffer, buffer_width, buffer_height, text_start_x, text_start_y, line_height, text, color, -1, 0);
         };
         std::pair<int, int> bounding_area(const int line_height, const char* text){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);

@@ -112,7 +112,8 @@ namespace lunaris::ui {
     };
 
     void connect(lunaris::window* win){
-        if(win->colors == NULL) win->colors = lunaris::styles::generate_color_palette_from_system();
+        win->colors = lunaris::styles::generate_color_palette_from_system();
+        win->focused = NULL;
         win->draw_handler = lunaris::ui::draw_handler;
         win->mouse_handler = lunaris::ui::mouse_handler;
         win->keyboard_handler = lunaris::ui::keyboard_handler;

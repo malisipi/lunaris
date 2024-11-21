@@ -36,9 +36,7 @@ namespace lunaris::ui {
                 win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->other_color);
                 win->graphics.rounded_rect_empty(this->fx, this->fy, this->fw, this->fh, 5, 2, win->colors->border_color);
                 // TODO: Support placeholder
-                char the_text[this->text.size()+1];
-                sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-                win->graphics.text(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), the_text, win->colors->text_color);
+                win->graphics.text_with_cursor(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), this->text.c_str(), win->colors->text_color, this->pos, win->colors->text_color);
                 // Vscrollbar 
                 this->vscrollbar->max = __how_many_char(this->text.c_str(), '\n');
                 this->vscrollbar->view = this->fh/20-1;
@@ -49,11 +47,9 @@ namespace lunaris::ui {
                 win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
                 if(this->text != ""){
                     char the_text[this->text.size()+1];
-                    sprintf(the_text, "%s¦%s", this->text.substr(0,this->pos).c_str(), this->text.substr(this->pos,this->text.size()-this->pos).c_str());
-                    win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), the_text, 0xFF000000);
+                    win->graphics.text_with_cursor(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->text.c_str(), 0xFF000000, 0, 0xFF000000);
                 } else {
-                    win->graphics.text(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), 0xFF444444);
-                    win->graphics.text(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), "¦", 0xFF000000);
+                    win->graphics.text_with_cursor(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), 0xFF444444, 0, 0xFF000000);
                 }
             };
         };
@@ -94,7 +90,6 @@ namespace lunaris::ui {
                     if(this->pos<text_size) this->pos++; // TODO: Support Unicode UTF-8
                 } else if(new_char != NULL && new_char[0] != '\0'){
                     if(event == keyboard::pressed) {
-                        //this->text += new_char;
                         this->text.insert(this->pos, new_char);
                         this->pos += strlen(new_char);
                     };

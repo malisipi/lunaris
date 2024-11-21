@@ -256,7 +256,7 @@ namespace lunaris {
                     const int xs = std::min(x1, x2);
                     const int ys = (xs==x1) ? y1 : y2;
                     const int ye = (xs!=x1) ? y1 : y2;
-                    
+
                     for(int x=0; x < width; x++){
                         this->pixel(xs+x, ys+(ye-ys)*x/width, color);
                     };
@@ -264,7 +264,7 @@ namespace lunaris {
                     const int ys = std::min(y1, y2);
                     const int xs = (ys==y1) ? x1 : x2;
                     const int xe = (ys!=y1) ? x1 : x2;
-                    
+
                     for(int y=0; y < height; y++){
                         this->pixel(xs+(xe-xs)*y/height, ys+y, color);
                     };
@@ -278,7 +278,7 @@ namespace lunaris {
                     const int xs = std::min(x1, x2);
                     const int ys = (xs==x1) ? y1 : y2;
                     const int ye = (xs!=x1) ? y1 : y2;
-                    
+
                     for(int x=0; x <= width; x++){
                         const int rel_start_y = -thickness/2;
                         for(int rel_y=rel_start_y;rel_y<thickness+rel_start_y;rel_y++){
@@ -289,7 +289,7 @@ namespace lunaris {
                     const int ys = std::min(y1, y2);
                     const int xs = (ys==y1) ? x1 : x2;
                     const int xe = (ys!=y1) ? x1 : x2;
-                    
+
                     for(int y=0; y <= height; y++){
                         const int rel_start_x = -thickness/2;
                         for(int rel_x=rel_start_x;rel_x<thickness+rel_start_x;rel_x++){
@@ -448,6 +448,9 @@ namespace lunaris {
             };
             void text(int x, int y, int line_height, const char* text, uint32_t color){
                 this->font->draw_text(outer->buffer, outer->width, outer->height, x, y, line_height, text, color);
+            };
+            void text_with_cursor(int x, int y, int line_height, const char* text, uint32_t color, uint64_t cursor_pos, uint32_t cursor_color){
+                this->font->draw_text_with_cursor(outer->buffer, outer->width, outer->height, x, y, line_height, text, color, cursor_pos, cursor_color);
             };
             std::pair<int, int> text_bounding_area(int line_height, const char* text){
                 return this->font->bounding_area(line_height, text);
