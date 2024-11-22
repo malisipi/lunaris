@@ -358,4 +358,13 @@ namespace lunaris {
         };
         return the_font;
     };
+
+    lunaris::font* new_font_from_memory(unsigned char* font_data){
+        lunaris::font* the_font = (lunaris::font*)malloc(sizeof(lunaris::font)); // TODO: Fix memory leak
+        the_font->font_buffer = font_data;
+        if (!stbtt_InitFont(&the_font->info, the_font->font_buffer, 0)){
+            printf("TTF Font initalition failed\n");
+        };
+        return the_font;
+    };
 };
