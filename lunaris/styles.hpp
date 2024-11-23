@@ -111,7 +111,12 @@ namespace lunaris::styles {
             return EM_ASM_({
                 return (!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
             });
+        #elif defined(_WIN32)
+            uint32_t is_light = 0;
+            lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", (char*)"AppsUseLightTheme", &is_light);
+            return is_light > 0;
         #endif
+
         return true;
     }
 

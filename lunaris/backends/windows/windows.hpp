@@ -260,7 +260,11 @@ namespace lunaris {
 
         RegisterClass(&wc);
 
-        win->__hwnd = CreateWindowEx(0, CLASS_NAME, "<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
+        #ifndef WIN32_ALPHA_SUPPORT
+            win->__hwnd = CreateWindowEx(0, CLASS_NAME, "<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
+        #else
+            win->__hwnd = CreateWindowEx(WS_EX_LAYERED, CLASS_NAME, "<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
+        #endif
 
         if (win->__hwnd == NULL) return 0;
 
@@ -373,7 +377,11 @@ namespace lunaris {
 
                 if (win->__bitmap) {
                     HDC memdc = CreateCompatibleDC(hdc);
-                    SelectObject(memdc, win->__bitmap);
+                    #ifndef WIN32_ALPHA_SUPPORT
+                        SelectObject(memdc, win->__bitmap);
+                    #else
+                        HBITMAP holdbitmap = (HBITMAP)SelectObject(memdc, win->__bitmap);
+                    #endif
 
                     win->buffer = (uint32_t*)win->__buffer;
                     if(win->draw_handler != NULL){
@@ -384,8 +392,19 @@ namespace lunaris {
                         };
                     };
 
-                    BitBlt(hdc, 0, 0, win->width, win->height, memdc, 0, 0, SRCCOPY);
+                    #ifndef WIN32_ALPHA_SUPPORT
+                        BitBlt(hdc, 0, 0, win->width, win->height, memdc, 0, 0, SRCCOPY);
+                    #else
+                        SIZE win_size = {win->width, win->height};
+                        POINT src_point = {0, 0};
+                        BLENDFUNCTION blend = {AC_SRC_OVER, 0, 255, AC_SRC_ALPHA};
+                        UpdateLayeredWindow(hwnd, hdc, NULL, &win_size, memdc, &src_point, 0, &blend, ULW_ALPHA);
+                        SelectObject(memdc, holdbitmap);
+                    #endif
                     DeleteDC(memdc);
+                    #ifdef WIN32_ALPHA_SUPPORT
+                        ReleaseDC(NULL, hdc);
+                    #endif
                 }
 
                 EndPaint(hwnd, &paint_struct);
