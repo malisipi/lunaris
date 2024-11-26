@@ -559,3 +559,5 @@ namespace lunaris {
 #ifdef emscripten
 #include "backends/emscripten/emscripten.hpp"
 #endif
+
+#include "effects.hpp"

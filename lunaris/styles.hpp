@@ -115,6 +115,22 @@ namespace lunaris::styles {
             uint32_t is_light = 0;
             lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", (char*)"AppsUseLightTheme", &is_light);
             return is_light > 0;
+        #elif defined(__linux__)
+            FILE* gsettings_output;
+            char gsettings_value[128];
+
+            gsettings_output = popen("gsettings get org.gnome.desktop.interface color-scheme", "r");
+            if (gsettings_output == NULL){
+                pclose(gsettings_output);
+                return true;
+            };
+
+            fgets(gsettings_value, sizeof(gsettings_value), gsettings_output);
+            bool is_light_theme = true;
+            if(strcmp(gsettings_value, "'prefer-dark'") == '\n') is_light_theme = false;
+
+            pclose(gsettings_output);
+            return is_light_theme;
         #endif
 
         return true;
@@ -122,5 +138,13 @@ namespace lunaris::styles {
 
     color_palette* generate_color_palette_from_system(){
         return generate_color_palette(is_system_theme_light(), get_system_color()); // TODO: Get system light/dark prefence.
+    };
+
+    void make_more_transparent(color_palette* palette){
+        palette->seconder_color -= 0x66000000;
+        palette->other_color -= 0x66000000;
+        palette->background_color -= 0x99000000;
+        palette->border_color -= 0x22000000;
+        palette->hover_color -= 0x44000000;
     };
 };

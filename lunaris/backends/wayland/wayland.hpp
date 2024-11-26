@@ -165,7 +165,7 @@ namespace lunaris {
             if(__xkb_context == NULL){
                 __xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 
-                char* keymap_string = (char*)mmap(NULL, size, PROT_READ, MAP_SHARED, fd, 0);
+                char* keymap_string = (char*)mmap(NULL, size, PROT_READ, MAP_PRIVATE, fd, 0);
                 if (keymap_string == MAP_FAILED) return;
 
                 __xkb_keymap = xkb_keymap_new_from_string(__xkb_context, keymap_string, XKB_KEYMAP_FORMAT_TEXT_V1, XKB_KEYMAP_COMPILE_NO_FLAGS);
