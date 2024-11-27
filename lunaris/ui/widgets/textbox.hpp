@@ -83,11 +83,14 @@ namespace lunaris::ui {
                         };
                     };
                 } else if(key == keycode::backspace){
-                    if(this->pos>0) this->text.erase(--this->pos, 1); // TODO: Support Unicode UTF-8
+                    for(;this->pos>0 && (this->text[this->pos-1]&0xC0) == 0x80;) this->text.erase(--this->pos, 1); // Deletes continuous characthers firstly
+                    if(this->pos>0) this->text.erase(--this->pos, 1); // Afterly, deletes unicode char
                 } else if(key == keycode::arrow_left){
-                    if(this->pos>0) this->pos--; // TODO: Support Unicode UTF-8
+                    if(this->pos>0) this->pos--;
+                    for(;this->pos>0 && (this->text[this->pos]&0xC0) == 0x80;) this->pos--; // Skip continuous characters
                 } else if(key == keycode::arrow_right){
-                    if(this->pos<text_size) this->pos++; // TODO: Support Unicode UTF-8
+                    if(this->pos<text_size) this->pos++;
+                    for(;this->pos<text_size && (this->text[this->pos]&0xC0) == 0x80;) this->pos++; // Skip continuous characters
                 } else if(new_char != NULL && new_char[0] != '\0'){
                     if(event == keyboard::pressed) {
                         this->text.insert(this->pos, new_char);
