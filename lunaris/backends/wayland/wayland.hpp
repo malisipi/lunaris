@@ -5,6 +5,7 @@ namespace lunaris {
     // keyboard
     #include <xkbcommon/xkbcommon.h>
 
+    pthread_mutex_t __xkb_initalize_lock = PTHREAD_MUTEX_INITIALIZER;
     struct xkb_context* __xkb_context = NULL;
     struct xkb_keymap* __xkb_keymap = NULL;
     struct xkb_state* __xkb_state = NULL;
@@ -162,6 +163,7 @@ namespace lunaris {
 
     const struct wl_keyboard_listener keyboard_listener = {
         .keymap = [](void* data, struct wl_keyboard* keyboard, uint32_t format, int fd, uint32_t size) { // Keymap aka keyboard layout
+            pthread_mutex_lock(&__xkb_initalize_lock);
             if(__xkb_context == NULL){
                 __xkb_context = xkb_context_new(XKB_CONTEXT_NO_FLAGS);
 
@@ -172,6 +174,7 @@ namespace lunaris {
                 close(fd);
                 __xkb_state = xkb_state_new(__xkb_keymap);
             };
+            pthread_mutex_unlock(&__xkb_initalize_lock);
         },
         .enter = [](void* data, struct wl_keyboard* keyboard, uint32_t serial, struct wl_surface* surface, struct wl_array* keys) {/* Keyboard focus (considered as window focus, mostly?) */},
         .leave = [](void* data, struct wl_keyboard* keyboard, uint32_t serial, struct wl_surface* surface) {
