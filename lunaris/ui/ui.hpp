@@ -129,3 +129,4 @@ namespace lunaris::ui {
 #include "widgets/textbox.hpp"
 #include "widgets/slider.hpp"
 #include "widgets/window-decorations.hpp"
+#include "widgets/window-shadow.hpp"

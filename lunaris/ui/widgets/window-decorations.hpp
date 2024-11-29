@@ -1,8 +1,8 @@
 namespace lunaris::ui {
     const uint32_t window_decorations_id = request_new_id();
-    const int button_width = 50;
     
     typedef struct window_decorations:layout {
+        const int button_width = 50;
         virtual uint32_t get_type(){
             return window_decorations_id;
         };
@@ -19,7 +19,7 @@ namespace lunaris::ui {
                 top_offset = 30;
                 win->graphics.rect(this->fx, this->fy, this->fw, top_offset, 0xFF666666);
 
-                win->graphics.text(8, 4, 22, this->title, 0xFFFFFFFF);
+                win->graphics.text(this->fx+8, this->fy+4, 22, this->title, 0xFFFFFFFF);
 
                 // Close
                 win->graphics.rect(this->fx+this->fw-button_width,this->fy, 50, 30, 0xFF999999);
@@ -80,14 +80,14 @@ namespace lunaris::ui {
                                 win->start_move();
                             };
                         } else if(event == lunaris::mouse::second) {
-                            win->show_window_menu(x, y);
-                        }
+                            win->show_window_menu(this->fx+x, this->fy+y);
+                        };
                     };
                 } else if(this->child != NULL){
-                    if(win->width+win->height-20<x+y){
+                    if(this->fw+this->fh-20<x+y){
                         if(pressed && event == lunaris::mouse::first) win->start_resize();
                     } else {
-                        this->child->mouse_event(win, x-this->fx+this->fx, y-this->fy-30, pressed, dx, dy, event);
+                        this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
                     };
                 };
             } else {
