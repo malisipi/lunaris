@@ -349,10 +349,32 @@ namespace lunaris {
         ShowWindow(win->__hwnd, SW_MINIMIZE);
     };
     void __backend_maximize(lunaris::window* win){
-        ShowWindow(win->__hwnd, SW_MAXIMIZE);
+        #ifndef WIN32_ALPHA_SUPPORT
+            ShowWindow(win->__hwnd, SW_MAXIMIZE);
+        #else
+            POINT cursor_pos;
+            GetCursorPos(&cursor_pos);
+            HMONITOR hmonitor = MonitorFromPoint(cursor_pos, MONITOR_DEFAULTTONEAREST);
+
+            MONITORINFO monitor_info;
+            monitor_info.cbSize = sizeof(MONITORINFO);
+            GetMonitorInfo(hmonitor, &monitor_info);
+
+            GetWindowRect(win->__hwnd, &win->__unmaximized_size);
+
+            SetWindowPos(win->__hwnd, NULL,
+                        monitor_info.rcWork.left, monitor_info.rcWork.top,
+                        monitor_info.rcWork.right-monitor_info.rcWork.left, monitor_info.rcWork.bottom-monitor_info.rcWork.top, 0);
+        #endif
     };
     void __backend_restore(lunaris::window* win){
-        ShowWindow(win->__hwnd, SW_RESTORE);
+        #ifndef WIN32_ALPHA_SUPPORT
+            ShowWindow(win->__hwnd, SW_RESTORE);
+        #else
+            SetWindowPos(win->__hwnd, NULL,
+                        win->__unmaximized_size.left, win->__unmaximized_size.top,
+                        win->__unmaximized_size.right-win->__unmaximized_size.left, win->__unmaximized_size.bottom-win->__unmaximized_size.top, 0);
+        #endif
     };
     void __backend_start_resize(lunaris::window* win){
         PostMessage(win->__hwnd, WM_SYSCOMMAND, SC_SIZE + WMSZ_BOTTOMRIGHT, 0);

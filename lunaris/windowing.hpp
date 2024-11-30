@@ -29,7 +29,7 @@
     #endif
 #endif
 
-#ifdef windows
+#ifdef _WIN32
     #include <windows.h>
     #include <windowsx.h>
 #endif
@@ -514,10 +514,13 @@ namespace lunaris {
         XShmSegmentInfo __shminfo;
         XImage* __image;
     #endif
-    #ifdef windows
+    #ifdef _WIN32
         HWND __hwnd;
         HBITMAP __bitmap = NULL;
         void* __buffer = NULL;
+        #ifdef WIN32_ALPHA_SUPPORT
+        RECT __unmaximized_size;
+        #endif
         /* To determine key repeates, since Windows doesn't report that */
         uint32_t __last_pressed_key = 0;
     #endif
@@ -544,7 +547,7 @@ namespace lunaris {
 #include "backends/x11/x11.hpp"
 #endif
 
-#ifdef windows
+#ifdef _WIN32
 #include "backends/windows/windows.hpp"
 #endif
 
