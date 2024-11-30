@@ -8,6 +8,8 @@ namespace lunaris::ui {
         };
         widget* child = NULL;
         bool should_decorated = true;
+        bool should_resizable = true; // This option will be ignored when decorations disabled
+        window_shadow* shadow = NULL;
         /* Decors:
          * | Titlebar (Max) | - (30|50) | [] (30|50) | x (30|50) | -> Height: 30
          */
@@ -69,22 +71,24 @@ namespace lunaris::ui {
                                 win->destroy();
                             } else if(this->fw-x<button_width*2){
                                 if(this->__is_maximized){
+                                    if(this->shadow != NULL) this->shadow->__is_maximized = false;
                                     win->restore();
                                 } else {
+                                    if(this->shadow != NULL) this->shadow->__is_maximized = true;
                                     win->maximize();
                                 };
                                 this->__is_maximized = !this->__is_maximized;
                             } else if(this->fw-x<button_width*3){
                                 win->minimize();
                             } else {
-                                win->start_move();
+                                if(!this->__is_maximized) win->start_move();
                             };
                         } else if(event == lunaris::mouse::second) {
                             win->show_window_menu(this->fx+x, this->fy+y);
                         };
                     };
                 } else if(this->child != NULL){
-                    if(this->fw+this->fh-20<x+y){
+                    if(!this->__is_maximized && this->should_resizable && this->fw+this->fh-30<x+y){
                         if(pressed && event == lunaris::mouse::first) win->start_resize();
                     } else {
                         this->child->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
