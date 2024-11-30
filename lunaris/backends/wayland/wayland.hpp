@@ -263,6 +263,7 @@ namespace lunaris {
             win->__mouse_x = (float)wl_fixed_to_double(surface_x);
             win->__mouse_y = (float)wl_fixed_to_double(surface_y);
             win->__mouse_last_serial = serial;
+            win->set_cursor(lunaris::cursor::arrow);
             if(win->mouse_handler != NULL){
                 win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::enter);
             };
