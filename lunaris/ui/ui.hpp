@@ -91,12 +91,24 @@ namespace lunaris::ui {
     }
 
     #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-        pthread_mutex_t __draw_lock = PTHREAD_MUTEX_INITIALIZER;
+        #warning LUNARIS_UI_DRAW_ON_ONLY_EVENT is an experiment. This may cause applications behave weirdly and may cause crashes.
+        #ifndef _WIN32
+            pthread_mutex_t __draw_lock = PTHREAD_MUTEX_INITIALIZER;
+        #else
+            bool __draw_lock = false;
+        #endif
     #endif
 
     void draw_handler(lunaris::window* win, uint32_t* buffer){
         #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-            pthread_mutex_lock(&__draw_lock);
+            #ifndef _WIN32
+                pthread_mutex_lock(&__draw_lock);
+            #else
+                if(__draw_lock){
+                    return;
+                };
+                __draw_lock = true;
+            #endif
         #endif
         win->graphics.rect(0, 0, win->width, win->height, win->colors->background_color);
 
@@ -111,7 +123,11 @@ namespace lunaris::ui {
 
     void mouse_handler(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
         #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-            pthread_mutex_unlock(&__draw_lock);
+            #ifndef _WIN32
+                pthread_mutex_unlock(&__draw_lock);
+            #else
+                __draw_lock = false;
+            #endif
         #endif
         lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
         layout->mouse_event(win, x, y, pressed, dx, dy, event);
@@ -119,7 +135,11 @@ namespace lunaris::ui {
 
     void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
         #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-            pthread_mutex_unlock(&__draw_lock);
+            #ifndef _WIN32
+                pthread_mutex_unlock(&__draw_lock);
+            #else
+                __draw_lock = false;
+            #endif
         #endif
         if(win->focused != NULL) ((lunaris::ui::widget*)win->focused)->keyboard_handler(win, new_char, key, modifiers, event);
     };
