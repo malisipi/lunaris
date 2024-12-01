@@ -90,7 +90,14 @@ namespace lunaris::ui {
         } query;
     }
 
+    #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
+        pthread_mutex_t __draw_lock = PTHREAD_MUTEX_INITIALIZER;
+    #endif
+
     void draw_handler(lunaris::window* win, uint32_t* buffer){
+        #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
+            pthread_mutex_lock(&__draw_lock);
+        #endif
         win->graphics.rect(0, 0, win->width, win->height, win->colors->background_color);
 
         lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
@@ -103,11 +110,17 @@ namespace lunaris::ui {
     };
 
     void mouse_handler(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
+        #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
+            pthread_mutex_unlock(&__draw_lock);
+        #endif
         lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
         layout->mouse_event(win, x, y, pressed, dx, dy, event);
     };
 
     void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
+        #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
+            pthread_mutex_unlock(&__draw_lock);
+        #endif
         if(win->focused != NULL) ((lunaris::ui::widget*)win->focused)->keyboard_handler(win, new_char, key, modifiers, event);
     };
 
