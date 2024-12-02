@@ -5,11 +5,47 @@ namespace lunaris::ui {
             return button_id;
         };
         std::string text = "";
+        std::string icon_text = "";
+        int icon_size = 30;
+        bool prefer_icon = true;
+        lunaris::layer* icon = NULL;
         void draw(lunaris::window* win, uint32_t* buffer){
             win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, win->colors->other_color);
             const int text_line_height = std::min(this->fh, 20);
-            std::pair<int, int> text_size = win->graphics.text_bounding_area(text_line_height, this->text.c_str());
-            win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), win->colors->text_color);
+            const std::pair<int, int> text_size = win->graphics.text_bounding_area(text_line_height, this->text.c_str());
+            const int icon_text_line_height = std::min(this->fh, icon_size);
+            const std::pair<int, int> icon_text_size = win->graphics.text_bounding_area(icon_text_line_height, this->icon_text.c_str());
+            /* | icon/4 pad | icon | centered text | */
+            if(this->icon_text == "" && this->icon == NULL){
+                win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), win->colors->text_color);
+            } else {
+                if(this->fw<100) {
+                    if(this->prefer_icon) {
+                        if(this->icon_text != ""){
+                            win->graphics.text(this->fx+(this->fw-icon_text_size.first)/2, this->fy+(this->fh-icon_text_size.second)/2, icon_text_size.second, this->icon_text.c_str(), win->colors->text_color);
+                        } else { // this->icon != NULL
+                            // draw image to center
+                        }; 
+                    } else {
+                        win->graphics.text(this->fx+(this->fw-text_size.first)/2, this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), win->colors->text_color);
+                    };
+                } else {
+                    if(this->text != ""){
+                        if(this->icon_text != ""){
+                            win->graphics.text(this->fx+icon_size/4, this->fy+(this->fh-icon_text_size.second)/2, icon_text_size.second, this->icon_text.c_str(), win->colors->text_color);
+                        } else { // this->icon != NULL
+                            // draw image to left
+                        };
+                        win->graphics.text(this->fx+(this->fw-(icon_size*5/4)-text_size.first)/2+(icon_size*5/4), this->fy+(this->fh-text_size.second)/2, text_line_height, this->text.c_str(), win->colors->text_color);
+                    } else {
+                        if(this->icon_text != ""){
+                            win->graphics.text(this->fx+(this->fw-icon_text_size.first)/2, this->fy+(this->fh-icon_text_size.second)/2, icon_text_size.second, this->icon_text.c_str(), win->colors->text_color);
+                        } else { // this->icon != NULL
+                            // draw image to center
+                        }; 
+                    }
+                }
+            };
         };
         void(*click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
         void(*double_click_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
