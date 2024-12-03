@@ -19,38 +19,34 @@ namespace lunaris::ui {
             int top_offset = 0;
             if(this->should_decorated){
                 top_offset = 30;
-                win->graphics.rect(this->fx, this->fy, this->fw, top_offset, 0xFF666666);
-
-                win->graphics.text(this->fx+8, this->fy+4, 22, this->title, 0xFFFFFFFF);
+                win->graphics.rect(this->fx, this->fy, this->fw, top_offset, win->colors->background_color);
+                win->graphics.text(this->fx+8, this->fy+4, 22, this->title,  win->colors->text_color);
 
                 // Close
-                win->graphics.rect(this->fx+this->fw-button_width,this->fy, 50, 30, 0xFF999999);
-                win->graphics.line_thick(this->fx+this->fw-5-button_width/2,this->fy+10,this->fx+this->fw+5-button_width/2,this->fy+20,2,0xFFFFFFFF);
-                win->graphics.line_thick(this->fx+this->fw+5-button_width/2,this->fy+10,this->fx+this->fw-5-button_width/2,this->fy+20,2,0xFFFFFFFF);
+                win->graphics.line_thick(this->fx+this->fw-5-button_width/2,this->fy+10,this->fx+this->fw+5-button_width/2,this->fy+20,2, win->colors->text_color);
+                win->graphics.line_thick(this->fx+this->fw+5-button_width/2,this->fy+10,this->fx+this->fw-5-button_width/2,this->fy+20,2, win->colors->text_color);
 
-                win->graphics.rect(this->fx+this->fw-button_width*2,this->fy, button_width, 30, 0xFF888888);
                 if(!this->__is_maximized){
                     // Maximize
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+10,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10,this->fx+this->fw-5-button_width*3/2,this->fy+20,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+20,this->fx+this->fw+5-button_width*3/2,this->fy+20,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+20,2,0xFFFFFFFF);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+10,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10,this->fx+this->fw-5-button_width*3/2,this->fy+20,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+20,this->fx+this->fw+5-button_width*3/2,this->fy+20,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+20,2, win->colors->text_color);
                 } else {
                     // Restore
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10+3,this->fx+this->fw+5-button_width*3/2-3,this->fy+10+2,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10+3,this->fx+this->fw-5-button_width*3/2,this->fy+20,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+20,this->fx+this->fw+5-button_width*3/2-3,this->fy+20,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2-3,this->fy+10+3,this->fx+this->fw+5-button_width*3/2-3,this->fy+20,2,0xFFFFFFFF);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10+3,this->fx+this->fw+5-button_width*3/2-3,this->fy+10+2,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+10+3,this->fx+this->fw-5-button_width*3/2,this->fy+20,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2,this->fy+20,this->fx+this->fw+5-button_width*3/2-3,this->fy+20,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2-3,this->fy+10+3,this->fx+this->fw+5-button_width*3/2-3,this->fy+20,2, win->colors->text_color);
 
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+3,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+10,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+3,this->fy+10,this->fx+this->fw-5-button_width*3/2+3,this->fy+20-(10-3),2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+(10-3),this->fy+20-3,this->fx+this->fw+5-button_width*3/2,this->fy+20-3,2,0xFFFFFFFF);
-                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+20-3,2,0xFFFFFFFF);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+3,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+10,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+3,this->fy+10,this->fx+this->fw-5-button_width*3/2+3,this->fy+20-(10-3),2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw-5-button_width*3/2+(10-3),this->fy+20-3,this->fx+this->fw+5-button_width*3/2,this->fy+20-3,2, win->colors->text_color);
+                    win->graphics.line_thick(this->fx+this->fw+5-button_width*3/2,this->fy+10,this->fx+this->fw+5-button_width*3/2,this->fy+20-3,2, win->colors->text_color);
                 };
 
                 // Minimize
-                win->graphics.rect(this->fx+this->fw-button_width*3,this->fy, button_width, 30, 0xFF777777);
-                win->graphics.line_thick(this->fx+this->fw-5-button_width*5/2,this->fy+15,this->fx+this->fw+5-button_width*5/2,this->fy+15,2,0xFFFFFFFF);
+                win->graphics.line_thick(this->fx+this->fw-5-button_width*5/2,this->fy+15,this->fx+this->fw+5-button_width*5/2,this->fy+15,2, win->colors->text_color);
             };
             
             if(this->child != NULL){

@@ -8,9 +8,12 @@ namespace lunaris::ui {
         std::string icon_text = "";
         int icon_size = 30;
         bool prefer_icon = true;
+        bool quiet = false; // Styling
         lunaris::layer* icon = NULL;
         void draw(lunaris::window* win, uint32_t* buffer){
-            win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, win->colors->other_color);
+            if(!this->quiet){
+                win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 10, win->colors->other_color);
+            };
             const int text_line_height = std::min(this->fh, 20);
             const std::pair<int, int> text_size = win->graphics.text_bounding_area(text_line_height, this->text.c_str());
             const int icon_text_line_height = std::min(this->fh, icon_size);
