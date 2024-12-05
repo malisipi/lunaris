@@ -160,6 +160,7 @@ namespace lunaris::ui {
 #include "widgets/button.hpp"
 #include "widgets/list.hpp"
 #include "widgets/textbox.hpp"
+#include "widgets/image.hpp"
 #include "widgets/slider.hpp"
 #include "widgets/window-shadow.hpp"
 #include "widgets/window-decorations.hpp"
