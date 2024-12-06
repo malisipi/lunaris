@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::ui::game {
     const uint32_t node_id = request_new_id();
     typedef struct node:widget {

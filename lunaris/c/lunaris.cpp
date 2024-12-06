@@ -1,6 +1,4 @@
-// clang++ lunaris/c/lunaris.cpp -shared -fPIC -o liblunaris.so
-
-#include "../ui.hpp"
+#include "../windowing.hpp"
 
 extern "C" {
     /* Typedefs */

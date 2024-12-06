@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris {
     #include <wayland-client.h>
     #include <wayland-egl.h>

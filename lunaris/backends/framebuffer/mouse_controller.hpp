@@ -1,3 +1,4 @@
+#pragma once
 
 namespace lunaris {
     namespace __framebuffer::__mouse {

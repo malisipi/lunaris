@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::__internal {
     #ifdef _WIN32
         void get_regedit_dword_value(char* path, char* key, uint32_t* _dwValue){

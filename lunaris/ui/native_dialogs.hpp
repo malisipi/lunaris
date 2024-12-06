@@ -1,3 +1,4 @@
+#pragma once
 #include <iostream>
 
 namespace lunaris::ui::native_dialogs {

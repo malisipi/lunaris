@@ -1,3 +1,5 @@
+#pragma once
+
 #include "./mpv_dynamic_loader.hpp"
 
 void poll_mpv_events (void* data);

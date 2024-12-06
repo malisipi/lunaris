@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::ui {
     int __how_many_char(const char* text, char schar) {
         int count = 0;

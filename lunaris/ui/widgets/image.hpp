@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::ui {
     const uint32_t image_id = request_new_id();
     typedef struct image:widget {

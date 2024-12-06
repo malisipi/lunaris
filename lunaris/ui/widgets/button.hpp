@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::ui {
     const uint32_t button_id = request_new_id();
     typedef struct button:widget {

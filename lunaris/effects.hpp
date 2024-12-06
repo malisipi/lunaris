@@ -13,7 +13,7 @@ namespace lunaris::effects::for_windows {
         #include <windows.h>
         #include <dwmapi.h>
 
-        #ifndef DWM_SYSTEMBACKDROP_TYPE
+        #ifdef DWM_MISSING_DECLARATIONS
             typedef enum {
                 DWMSBT_AUTO,
                 DWMSBT_NONE, // None
@@ -22,17 +22,9 @@ namespace lunaris::effects::for_windows {
                 DWMSBT_TABBEDWINDOW // Tabbed
             } DWM_SYSTEMBACKDROP_TYPE;
 
-            #ifndef DWMWA_USE_HOSTBACKDROPBRUSH
-                #define DWMWA_USE_HOSTBACKDROPBRUSH 17
-            #endif
-
-            #ifndef DWMWA_USE_IMMERSIVE_DARK_MODE
-                #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
-            #endif
-
-            #ifndef DWMWA_SYSTEMBACKDROP_TYPE
-                #define DWMWA_SYSTEMBACKDROP_TYPE 38
-            #endif
+            #define DWMWA_USE_HOSTBACKDROPBRUSH 17
+            #define DWMWA_USE_IMMERSIVE_DARK_MODE 20
+            #define DWMWA_SYSTEMBACKDROP_TYPE 38
         #endif
 
         void set_material(lunaris::window* win, lunaris::effects::for_windows::material material, bool is_light_material){

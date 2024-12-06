@@ -1,4 +1,4 @@
-#include <ctype.h>
+#pragma once
 
 namespace lunaris::styles {
     typedef struct color_palette {

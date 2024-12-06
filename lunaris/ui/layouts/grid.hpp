@@ -1,3 +1,5 @@
+#pragma once
+
 namespace lunaris::ui {
         const uint32_t grid_id = request_new_id();
     typedef struct grid:layout {
