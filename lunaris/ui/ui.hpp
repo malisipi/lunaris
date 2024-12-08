@@ -158,6 +158,7 @@ namespace lunaris::ui {
 #include "layouts/fixed.hpp"
 #include "layouts/grid.hpp"
 #include "layouts/dynamic.hpp"
+#include "widgets/label.hpp"
 #include "widgets/button.hpp"
 #include "widgets/list.hpp"
 #include "widgets/textbox.hpp"
