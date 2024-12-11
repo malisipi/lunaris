@@ -85,10 +85,15 @@ namespace lunaris::styles {
                 };
             };
         #elif defined(_WIN32)
-            uint32_t color_abgr = 0;
-            lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\DWM", (char*)"AccentColor", &color_abgr);
-            if(color_abgr == 0) return 0x00000000;
-            return 0xFF000000 | (color_abgr & 0x0000FF00) | ((color_abgr<<16) & 0x00FF0000) | ((color_abgr>>16) & 0x000000FF);
+            #ifdef LUNARIS_SUPPORT_WIN_XP
+                COLORREF legacy_accent_color = GetSysColor(COLOR_HIGHLIGHT);
+                return 0xFF000000 | (GetRValue(legacy_accent_color)<<16) | (GetGValue(legacy_accent_color)<<8) | (GetBValue(legacy_accent_color));
+            #else
+                uint32_t color_abgr = 0;
+                lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\DWM", (char*)"AccentColor", &color_abgr);
+                if(color_abgr == 0) return 0x00000000;
+                return 0xFF000000 | (color_abgr & 0x0000FF00) | ((color_abgr<<16) & 0x00FF0000) | ((color_abgr>>16) & 0x000000FF);
+            #endif
         #elif defined(__EMSCRIPTEN__)
             uint32_t color = 0xFF000000 | EM_ASM_INT({
                 let calculator_element = document.createElement("div");
@@ -113,9 +118,14 @@ namespace lunaris::styles {
                 return (!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches));
             });
         #elif defined(_WIN32)
-            uint32_t is_light = 0;
-            lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", (char*)"AppsUseLightTheme", &is_light);
-            return is_light > 0;
+            #ifdef LUNARIS_SUPPORT_WIN_XP
+                COLORREF legacy_background_color = GetSysColor(COLOR_WINDOW);
+                return GetRValue(legacy_background_color)+GetGValue(legacy_background_color)+GetBValue(legacy_background_color) > 550; // 0-765 > 550
+            #else
+                uint32_t is_light = 0;
+                lunaris::__internal::get_regedit_dword_value((char*)"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", (char*)"AppsUseLightTheme", &is_light);
+                return is_light > 0;
+            #endif
         #elif defined(__linux__)
             FILE* gsettings_output;
             char gsettings_value[128];

@@ -17,7 +17,11 @@ namespace lunaris {
 
     char* get_system_font(){
         #if defined(_WIN32)
-            return (char*)"C:/Windows/Fonts/segoeui.ttf";
+            #ifndef LUNARIS_SUPPORT_WIN_XP
+                return (char*)"C:/Windows/Fonts/segoeui.ttf";
+            #else
+                return (char*)"C:/Windows/Fonts/ARIAL.TTF";
+            #endif
         #elif defined(linux)
             return (char*)"/usr/share/fonts/noto/NotoSans-Regular.ttf";
         #elif defined(__HAIKU__)

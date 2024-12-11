@@ -573,14 +573,16 @@ namespace lunaris {
                 win->mouse_handler(win, cursor_pos.x, cursor_pos.y, 0, 0, GET_WHEEL_DELTA_WPARAM(wparam)/-8 /*Windows sends 120, needs to mapped as 15. So (wparam*15/120) * -1 (to fix axis) */, lunaris::mouse::scroll);
                 return 0;
             };
-            case WM_MOUSEHWHEEL: {
-                POINT cursor_pos;
-                cursor_pos.x = GET_X_LPARAM(lparam);
-                cursor_pos.y = GET_Y_LPARAM(lparam);
-                ScreenToClient(hwnd, &cursor_pos);
-                win->mouse_handler(win, cursor_pos.x, cursor_pos.y, 0, GET_WHEEL_DELTA_WPARAM(wparam)/-8 /*Windows sends 120, needs to mapped as 15. So (wparam*15/120) * -1 (to fix axis) */, 0, lunaris::mouse::scroll);
-                return 0;
-            };
+            #ifndef LUNARIS_SUPPORT_WIN_XP
+                case WM_MOUSEHWHEEL: {
+                    POINT cursor_pos;
+                    cursor_pos.x = GET_X_LPARAM(lparam);
+                    cursor_pos.y = GET_Y_LPARAM(lparam);
+                    ScreenToClient(hwnd, &cursor_pos);
+                    win->mouse_handler(win, cursor_pos.x, cursor_pos.y, 0, GET_WHEEL_DELTA_WPARAM(wparam)/-8 /*Windows sends 120, needs to mapped as 15. So (wparam*15/120) * -1 (to fix axis) */, 0, lunaris::mouse::scroll);
+                    return 0;
+                };
+            #endif
             case WM_KEYDOWN:
             case WM_KEYUP: {
                 bool is_keydown_event = ((lparam>>31)&0x01)==0; // 1 for KEYDOWN; 0 for KEYUP
