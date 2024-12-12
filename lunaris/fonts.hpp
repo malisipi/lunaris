@@ -20,7 +20,7 @@ namespace lunaris {
             #ifndef LUNARIS_SUPPORT_WIN_XP
                 return (char*)"C:/Windows/Fonts/segoeui.ttf";
             #else
-                return (char*)"C:/Windows/Fonts/ARIAL.TTF";
+                return (char*)"C:/Windows/Fonts/TAHOMA.TTF";
             #endif
         #elif defined(linux)
             return (char*)"/usr/share/fonts/noto/NotoSans-Regular.ttf";
