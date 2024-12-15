@@ -50,19 +50,21 @@ namespace lunaris::ui {
 
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
-            if(x < ((this->is_opened) ? this->opened_width : this->minimal_width) && event == lunaris::mouse::first && pressed){
-                int top_nav = 0;
-                bool first_state = this->is_opened;
-                for(std::vector<navigation_item*>::iterator _nav_item = this->items.begin(); _nav_item != this->items.end(); _nav_item++){
-                    navigation_item* nav_item = *_nav_item;
-                    top_nav += (this->is_opened) ? nav_item->opened_height : nav_item->minimal_height;
-                    if(y<top_nav){
-                        nav_item->widget->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
-                        if(first_state) this->is_opened = false; // Close sidenav when lose focus
-                        return;
+            if(x < ((this->is_opened) ? this->opened_width : this->minimal_width)){
+                if(event == lunaris::mouse::first && pressed){
+                    int top_nav = 0;
+                    bool first_state = this->is_opened;
+                    for(std::vector<navigation_item*>::iterator _nav_item = this->items.begin(); _nav_item != this->items.end(); _nav_item++){
+                        navigation_item* nav_item = *_nav_item;
+                        top_nav += (this->is_opened) ? nav_item->opened_height : nav_item->minimal_height;
+                        if(y<top_nav){
+                            nav_item->widget->mouse_event(win, x-this->child->fx+this->fx, y-this->child->fy+this->fy, pressed, dx, dy, event);
+                            if(first_state) this->is_opened = false; // Close sidenav when lose focus
+                            return;
+                        };
                     };
+                    if(first_state) this->is_opened = false; // Close sidenav when lose focus
                 };
-                if(first_state) this->is_opened = false; // Close sidenav when lose focus
                 return;
             };
             if(pressed && this->is_opened) this->is_opened = false; // Close sidenav when lose focus

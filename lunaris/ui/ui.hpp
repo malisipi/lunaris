@@ -167,3 +167,4 @@ namespace lunaris::ui {
 #include "widgets/window-shadow.hpp"
 #include "widgets/window-decorations.hpp"
 #include "widgets/navigation.hpp"
+#include "widgets/menubar.hpp"
