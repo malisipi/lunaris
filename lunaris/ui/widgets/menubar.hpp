@@ -90,7 +90,7 @@ namespace lunaris::ui {
                 if(event == lunaris::mouse::motion) this->__hovered = -1;
             } else {
                 if(this->__selected != -1 ){
-                    if(x >= this->__sub_menu_x, x <= this->__sub_menu_x + this->__sub_menu_w){
+                    if(x >= this->__sub_menu_x && x <= this->__sub_menu_x + this->__sub_menu_w){
                         this->__sub_menu_hovered = y/this->menubar_size - 1; // Includes main menubar to this area, -1 operation is caused by main menubar
                         const menubar_item* selected_menu =  this->menu[this->__selected];
                         if(this->__sub_menu_hovered >= selected_menu->items.size()) this->__sub_menu_hovered = -1;
