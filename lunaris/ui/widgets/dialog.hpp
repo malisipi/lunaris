@@ -43,7 +43,7 @@ namespace lunaris::ui {
                 this->child->mouse_event(win, x, y, pressed, dx, dy, event);
             } else {
                 if(dialog->fx-this->fx <=x && dialog->fy-this->fy <=y && dialog->fx-this->fx+dialog->fw >=x && dialog->fy-this->fy+dialog->fh >=y){
-                    this->dialog->mouse_event(win, x, y, pressed, dx, dy, event);
+                    this->dialog->mouse_event(win, x-dialog->fx+this->fx, y-dialog->fy+this->fy, pressed, dx, dy, event);
                 };
             };
         };
