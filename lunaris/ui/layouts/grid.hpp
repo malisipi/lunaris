@@ -17,7 +17,7 @@ namespace lunaris::ui {
         template <typename T> void place(T child) {
             this->childs.push_back((widget*)child);
         };
-        void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        void draw (lunaris::window* win, uint32_t* buffer){
             int grid_index = -1;
             int grid_planned_count = row_count*col_count;
             for(std::vector<widget*>::iterator child_ptr = this->childs.begin(); child_ptr != this->childs.end(); child_ptr++){
@@ -30,11 +30,7 @@ namespace lunaris::ui {
 
                 child->__set_f_size(this->fx+this->col_margin+(col_width+col_gap)*col_index, this->fy+this->row_margin+(row_height+row_gap)*row_index,
                                     col_width, row_height);
-                if(child->is_layout()){
-                    ((layout*)child)->calculate_n_draw(win, buffer);
-                } else {
-                    child->draw(win, buffer);
-                };
+                child->draw(win, buffer);
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){

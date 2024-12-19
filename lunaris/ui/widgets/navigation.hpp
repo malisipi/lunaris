@@ -19,17 +19,13 @@ namespace lunaris::ui {
         int opened_width = 200;
         bool is_opened = false;
         std::vector<navigation_item*> items;
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             int side_width = this->minimal_width; // this will show the navigation as overlay
             if(!as_overlay) side_width = (this->is_opened) ? this->opened_width : this->minimal_width;
 
             if(this->child != NULL){
                 this->child->__set_f_size(this->child->rx+this->fx+side_width, this->child->ry+this->fy, this->fw-side_width, this->fh);
-                if(this->child->is_layout()){
-                    ((layout*)this->child)->calculate_n_draw(win, buffer);
-                } else {
-                    this->child->draw(win, buffer);
-                };
+                this->child->draw(win, buffer);
             };
             win->graphics.rect(this->fx, this->fy, (this->is_opened) ? this->opened_width : this->minimal_width, this->fh, win->colors->background_color);
 
@@ -40,11 +36,7 @@ namespace lunaris::ui {
                 top_nav += (this->is_opened) ? nav_item->opened_height : nav_item->minimal_height;
 
                 if(((this->is_opened) ? nav_item->opened_height : nav_item->minimal_height) > 0){ // If the size of widget is bigger than 0, if not it will not rendered; can be used hide widgets in closed/opened
-                    if(nav_item->widget->is_layout()){
-                        ((layout*)nav_item->widget)->calculate_n_draw(win, buffer);
-                    } else {
-                        nav_item->widget->draw(win, buffer);
-                    };
+                    nav_item->widget->draw(win, buffer);
                 };
             };
 

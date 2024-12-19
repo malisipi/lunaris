@@ -14,7 +14,7 @@ namespace lunaris::ui {
             this->childs.push_back((widget*)child);
             child->__set_a_size(x.c_str(), y.c_str(), w.c_str(), h.c_str());
         };
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             for(std::vector<widget*>::iterator child_ptr = this->childs.begin(); child_ptr != this->childs.end(); child_ptr++){
                 widget* child = *child_ptr;
                 if(child->used_anchor){
@@ -22,11 +22,7 @@ namespace lunaris::ui {
                 } else {
                     child->__set_f_size(child->rx+this->fx, child->ry+this->fy, child->rw, child->rh);
                 };
-                if(child->is_layout()){
-                    ((layout*)child)->calculate_n_draw(win, buffer);
-                } else {
-                    child->draw(win, buffer);
-                };
+                child->draw(win, buffer);
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){

@@ -81,7 +81,6 @@ namespace lunaris::ui {
         virtual uint32_t get_type(){
             return layout_id;
         };
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){};
     } layout;
 
     namespace query {
@@ -115,7 +114,7 @@ namespace lunaris::ui {
 
         lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
         layout->__set_f_size(0, 0, win->width, win->height);
-        layout->calculate_n_draw(win, buffer);
+        layout->draw(win, buffer);
 
         /*if(win->focused != NULL) {
             win->graphics.rect_empty(((lunaris::ui::widget*)win->focused)->fx-1, ((lunaris::ui::widget*)win->focused)->fy-1, ((lunaris::ui::widget*)win->focused)->fw+2, ((lunaris::ui::widget*)win->focused)->fh+2, 2, 0xFFAAAAAA);

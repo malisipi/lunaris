@@ -8,13 +8,9 @@ namespace lunaris::ui {
         };
         widget* child = NULL;
         widget* dialog = NULL;
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             ((layout*)child)->__set_f_size(this->fx, this->fy, this->fw, this->fh);
-            if(child->is_layout()){
-                ((layout*)child)->calculate_n_draw(win, buffer);
-            } else {
-                child->draw(win, buffer);
-            };
+            child->draw(win, buffer);
             if(this->dialog != NULL){
                 // Shadow
                 for(int rx=0;rx<this->fw;rx++){
@@ -31,11 +27,7 @@ namespace lunaris::ui {
                     dialog->__set_f_size(this->fx+(this->fw-dialog->rw)/2, this->fy+(this->fh-dialog->rh)/2, this->dialog->rw, dialog->rh);
                 };
                 win->graphics.rounded_rect(dialog->fx, dialog->fy, dialog->fw, dialog->fh, 10, win->colors->background_color);
-                if(dialog->is_layout()){
-                    ((layout*)dialog)->calculate_n_draw(win, buffer);
-                } else {
-                    dialog->draw(win, buffer);
-                };
+                dialog->draw(win, buffer);
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){

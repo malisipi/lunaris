@@ -25,14 +25,10 @@ namespace lunaris::ui {
         int __sub_menu_w = -1;
         int __sub_menu_hovered = -1;
         const int menubar_size = 24;
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             if(this->child != NULL){
                 this->child->__set_f_size(this->child->rx+this->fx, this->child->ry+this->fy+menubar_size, this->fw, this->fh-menubar_size);
-                if(this->child->is_layout()){
-                    ((layout*)this->child)->calculate_n_draw(win, buffer);
-                } else {
-                    this->child->draw(win, buffer);
-                };
+                this->child->draw(win, buffer);
             };
             win->graphics.rect(this->fx, this->fy, this->fw, menubar_size, win->colors->background_color);
             int item_pos_x = 0;

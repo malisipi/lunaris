@@ -11,18 +11,14 @@ namespace lunaris::ui {
         widget* child = NULL;
         bool should_decorated = true;
         bool __is_maximized = false;
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             int shadow_offset = 0;
             if(this->should_decorated && !this->__is_maximized){
                 shadow_offset = this->shadow_offset;
             };
             if(this->child != NULL){
                 this->child->__set_f_size(this->child->rx+this->fx+shadow_offset, this->child->ry+this->fy+shadow_offset, this->fw-shadow_offset*2, this->fh-shadow_offset*2);
-                if(this->child->is_layout()){
-                    ((layout*)this->child)->calculate_n_draw(win, buffer);
-                } else {
-                    this->child->draw(win, buffer);
-                };
+                this->child->draw(win, buffer);
             };
             if(this->should_decorated && !this->__is_maximized){
                 for(int si=0; si<shadow_offset; si++){

@@ -17,7 +17,7 @@ namespace lunaris::ui {
          */
         bool __is_maximized = false;
         char title[512] = "";
-        virtual void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        virtual void draw (lunaris::window* win, uint32_t* buffer){
             int top_offset = 0;
             if(this->should_decorated){
                 top_offset = 30;
@@ -53,11 +53,7 @@ namespace lunaris::ui {
             
             if(this->child != NULL){
                 this->child->__set_f_size(this->child->rx+this->fx, this->child->ry+this->fy+top_offset, this->fw, this->fh-top_offset);
-                if(this->child->is_layout()){
-                    ((layout*)this->child)->calculate_n_draw(win, buffer);
-                } else {
-                    this->child->draw(win, buffer);
-                };
+                this->child->draw(win, buffer);
             };
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){

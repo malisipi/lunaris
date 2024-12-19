@@ -19,16 +19,12 @@ namespace lunaris::ui {
                     };
             };
         };
-        void calculate_n_draw (lunaris::window* win, uint32_t* buffer){
+        void draw (lunaris::window* win, uint32_t* buffer){
             widget* child = NULL;
             ___get_child(&child);
             if(child == NULL) return;
             child->__set_f_size(this->fx, this->fy, this->fw, this->fh);
-            if(child->is_layout()){
-                ((layout*)child)->calculate_n_draw(win, buffer);
-            } else {
-                child->draw(win, buffer);
-            };
+            child->draw(win, buffer);
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             widget* child = NULL;
