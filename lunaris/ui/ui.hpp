@@ -20,10 +20,10 @@ namespace lunaris::ui {
         float rh = 0;
         // Relative to layout, should be used while storing anchor points
         bool used_anchor = false;
-        const char* ax = 0;
-        const char* ay = 0;
-        const char* aw = 0;
-        const char* ah = 0;
+        char ax[64] = {0};
+        char ay[64] = {0};
+        char aw[64] = {0};
+        char ah[64] = {0};
         // Sticked to window
         int fx = 0;
         int fy = 0;
@@ -63,10 +63,10 @@ namespace lunaris::ui {
         };
         void __set_a_size(const char* x, const char* y, const char* w, const char* h){
             this->used_anchor = true;
-            this->ax = x;
-            this->ay = y;
-            this->aw = w;
-            this->ah = h;
+            sprintf(this->ax, "%s", x);
+            sprintf(this->ay, "%s", y);
+            sprintf(this->aw, "%s", w);
+            sprintf(this->ah, "%s", h);
         };
         virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){ /*printf("Mouse at %f, %f\n", x, y);*/ };
         virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){};
@@ -168,3 +168,4 @@ namespace lunaris::ui {
 #include "widgets/window-decorations.hpp"
 #include "widgets/navigation.hpp"
 #include "widgets/menubar.hpp"
+#include "widgets/dialog.hpp"
