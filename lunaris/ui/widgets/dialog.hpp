@@ -19,7 +19,7 @@ namespace lunaris::ui {
                 // Shadow
                 for(int rx=0;rx<this->fw;rx++){
                     for(int ry=0;ry<this->fh;ry++){
-                        if((rx+ry)%5) win->graphics.pixel(this->fx+rx, this->fy+ry, 0xFF000000);
+                        if((rx+ry)%3) win->graphics.pixel(this->fx+rx, this->fy+ry, 0xFF000000);
                     };
                 };
                 // Dialog
@@ -30,6 +30,7 @@ namespace lunaris::ui {
                 } else {
                     dialog->__set_f_size(this->fx+(this->fw-dialog->rw)/2, this->fy+(this->fh-dialog->rh)/2, this->dialog->rw, dialog->rh);
                 };
+                win->graphics.rounded_rect(dialog->fx, dialog->fy, dialog->fw, dialog->fh, 10, win->colors->background_color);
                 if(dialog->is_layout()){
                     ((layout*)dialog)->calculate_n_draw(win, buffer);
                 } else {
