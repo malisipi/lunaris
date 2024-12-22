@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-namespace lunaris::ui::anchor {
+namespace lunaris{namespace ui {namespace anchor {
     // "x|20%x"
     // "50%x + 20"
     // "50%x + 20 * 4"
@@ -151,4 +151,4 @@ namespace lunaris::ui::anchor {
         printf("Invalid anchor (%s): %s\n", sub_reason, anchor);
         return 1;
     };
-};
+}}};
