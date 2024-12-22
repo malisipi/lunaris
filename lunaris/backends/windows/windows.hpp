@@ -517,7 +517,7 @@ namespace lunaris {
                 }
                 return 0;
             };
-            #ifndef LUNARIS_SUPPORT_WIN_2000
+
             case WM_XBUTTONDOWN: {
                 if(win->mouse_handler != NULL){
                     if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
@@ -535,7 +535,6 @@ namespace lunaris {
                 };
                 return 0;
             };
-            #endif
 
             case WM_LBUTTONUP: {
                 if(win->mouse_handler != NULL){
@@ -564,7 +563,7 @@ namespace lunaris {
                 };
                 return 0;
             };
-            #ifndef LUNARIS_SUPPORT_WIN_2000
+
             case WM_XBUTTONUP: {
                 if(win->mouse_handler != NULL){
                     if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
@@ -582,7 +581,7 @@ namespace lunaris {
                 };
                 return 0;
             };
-            #endif
+
             case WM_MOUSEWHEEL: {
                 POINT cursor_pos;
                 cursor_pos.x = GET_X_LPARAM(lparam);
