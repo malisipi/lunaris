@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION 
-#include "thirdparty/stb/stb_truetype.h" /* http://nothings.org/stb/stb_truetype.h */
+#include "thirdparty/stb/stb_truetype.h"
 
 namespace lunaris {
     #define uint_color_red(color)   ((color >> (4*4)) & 0xFF)
@@ -17,11 +17,14 @@ namespace lunaris {
 
     char* get_system_font(){
         #if defined(_WIN32)
+            static char* system_root = getenv((char*)"SystemRoot");
+            static char* font_path = (char*)malloc(sizeof(char)*512);
             #ifndef LUNARIS_SUPPORT_WIN_XP
-                return (char*)"C:/Windows/Fonts/segoeui.ttf";
+                sprintf(font_path, "%s%s", system_root, (char*)"/Fonts/segoeui.ttf");
             #else
-                return (char*)"C:/Windows/Fonts/TAHOMA.TTF";
+                sprintf(font_path, "%s%s", system_root, (char*)"/Fonts/TAHOMA.TTF");
             #endif
+            return font_path;
         #elif defined(linux)
             return (char*)"/usr/share/fonts/noto/NotoSans-Regular.ttf";
         #elif defined(__HAIKU__)

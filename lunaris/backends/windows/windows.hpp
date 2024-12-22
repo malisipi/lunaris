@@ -46,8 +46,10 @@ namespace lunaris {
             case 0x38: return _8;
             case 0x39: return _9;
             case 0x30: return _0;
+            #ifndef LUNARIS_SUPPORT_WIN_2000
             case VK_OEM_MINUS: return minus;
             case VK_OEM_PLUS: return _equal;
+            #endif
             case VK_BACK: return backspace;
             case VK_TAB: return tab;
             case 0x51: return q;
@@ -106,8 +108,10 @@ namespace lunaris {
             case 0x42: return b;
             case 0x4E: return n;
             case 0x4D: return m;
+            #ifndef LUNARIS_SUPPORT_WIN_2000
             case VK_OEM_COMMA: return comma;
             case VK_OEM_PERIOD: return dot;
+            #endif
             case VK_OEM_2: return slash;
             case VK_SPACE: return space;
             case VK_CAPITAL: return caps_lock;
@@ -141,7 +145,9 @@ namespace lunaris {
             case VK_DECIMAL: return np_dot;
             case VK_SEPARATOR: return np_enter;
             case VK_DIVIDE: return np_slash;
+            #ifndef LUNARIS_SUPPORT_WIN_2000
             case VK_OEM_102:  return _102nd;
+            #endif
             case VK_UP: return arrow_up;
             case VK_LEFT: return arrow_left;
             case VK_RIGHT: return arrow_right;
@@ -242,7 +248,11 @@ namespace lunaris {
             std::chrono::duration<double, std::milli> elapsed = end - start;
 
             if (elapsed.count() < frame_time) {
-                std::this_thread::sleep_for(std::chrono::milliseconds(frame_time) - elapsed);
+                #ifndef LUNARIS_SUPPORT_WIN_2000
+                    std::this_thread::sleep_for(std::chrono::milliseconds(frame_time) - elapsed);
+                #else
+                    usleep(frame_time-elapsed.count());
+                #endif
             }
         }
         return NULL;
@@ -507,6 +517,7 @@ namespace lunaris {
                 }
                 return 0;
             };
+            #ifndef LUNARIS_SUPPORT_WIN_2000
             case WM_XBUTTONDOWN: {
                 if(win->mouse_handler != NULL){
                     if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
@@ -524,6 +535,7 @@ namespace lunaris {
                 };
                 return 0;
             };
+            #endif
 
             case WM_LBUTTONUP: {
                 if(win->mouse_handler != NULL){
@@ -552,6 +564,7 @@ namespace lunaris {
                 };
                 return 0;
             };
+            #ifndef LUNARIS_SUPPORT_WIN_2000
             case WM_XBUTTONUP: {
                 if(win->mouse_handler != NULL){
                     if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
@@ -569,6 +582,7 @@ namespace lunaris {
                 };
                 return 0;
             };
+            #endif
             case WM_MOUSEWHEEL: {
                 POINT cursor_pos;
                 cursor_pos.x = GET_X_LPARAM(lparam);

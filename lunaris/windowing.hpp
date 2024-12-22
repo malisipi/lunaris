@@ -5,7 +5,12 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <pthread.h>
+#ifndef LUNARIS_SUPPORT_WIN_2000 
+    #include <pthread.h>
+#else
+    #include "./backends/windows/windows_2000_patch.hpp"
+    #define LUNARIS_SUPPORT_WIN_XP
+#endif
 #include <time.h>
 #include <chrono>
 #include <thread>

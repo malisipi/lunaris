@@ -1,5 +1,8 @@
 #pragma once
 #define STB_IMAGE_IMPLEMENTATION
+#ifdef LUNARIS_SUPPORT_WIN_2000
+#define STBI_NO_THREAD_LOCALS
+#endif
 #include "thirdparty/stb/stb_image.h"
 
 namespace lunaris {
