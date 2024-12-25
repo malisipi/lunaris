@@ -36,7 +36,7 @@ namespace lunaris {
             // This event will only fired when clicked enter
             void draw(lunaris::window* win, uint32_t* buffer){ // TODO: Fix text cursor
                 if(this->multiline){
-                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->other_color);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
                     win->graphics.rounded_rect_empty(this->fx, this->fy, this->fw, this->fh, 5, 2, win->colors->border_color);
                     // TODO: Support placeholder
                     win->graphics.text_with_cursor(this->fx, this->fy-this->vscrollbar->value*20, std::min(this->fh, 20), this->text.c_str(), win->colors->text_color, this->pos, win->colors->text_color);

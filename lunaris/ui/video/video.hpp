@@ -5,6 +5,7 @@
 void poll_mpv_events (void* data);
 
 namespace lunaris {
+
     namespace ui {
         const uint32_t video_id = request_new_id();
         typedef struct video:widget {
@@ -91,27 +92,27 @@ namespace lunaris {
             virtual void mouse_event(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){};
             virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){};
         } video;
-    }
+    };
+};
 
-    void poll_mpv_events (void* widget_ptr){
-        lunaris::ui::video* widget = (lunaris::ui::video*)widget_ptr;
-        for(;;){
-            mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
-            if(event->event_id == MPV_EVENT_NONE) break;
+void poll_mpv_events (void* widget_ptr){
+    lunaris::ui::video* widget = (lunaris::ui::video*)widget_ptr;
+    for(;;){
+        mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
+        if(event->event_id == MPV_EVENT_NONE) break;
 
-            if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
-                struct mpv_event_property* prop = (struct mpv_event_property*)event->data;
-                if(strcmp(prop->name, "time-pos") == 0){
-                    if(prop->format == MPV_FORMAT_DOUBLE){
-                        if(widget->time_pos_update_handler != NULL){
-                            widget->time_pos_update_handler(widget->_win, widget, *((double*)(prop->data)));
-                        };
+        if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
+            struct mpv_event_property* prop = (struct mpv_event_property*)event->data;
+            if(strcmp(prop->name, "time-pos") == 0){
+                if(prop->format == MPV_FORMAT_DOUBLE){
+                    if(widget->time_pos_update_handler != NULL){
+                        widget->time_pos_update_handler(widget->_win, widget, *((double*)(prop->data)));
                     };
-                } else if(strcmp(prop->name, "duration") == 0){
-                    if(prop->format == MPV_FORMAT_DOUBLE){
-                        if(widget->duration_update_handler != NULL){
-                            widget->duration_update_handler(widget->_win, widget, *((double*)(prop->data)));
-                        };
+                };
+            } else if(strcmp(prop->name, "duration") == 0){
+                if(prop->format == MPV_FORMAT_DOUBLE){
+                    if(widget->duration_update_handler != NULL){
+                        widget->duration_update_handler(widget->_win, widget, *((double*)(prop->data)));
                     };
                 };
             };
