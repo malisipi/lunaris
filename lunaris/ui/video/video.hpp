@@ -12,7 +12,7 @@ namespace lunaris {
             virtual uint32_t get_type(){
                 return video_id;
             };
-            mpv_handle* mpv_handle = NULL;
+            mpv_handle* _mpv_handle = NULL;
             mpv_render_context* mpv_context = NULL;
             lunaris::window* _win = NULL; // TODO: Remove in future, it's ridiculous and unsafe
             int _event_pooled_timer = 0;
@@ -24,9 +24,9 @@ namespace lunaris {
                 };
                 if(!_is_mpv_loaded) return;
 
-                this->mpv_handle = dmpv_create();
-                dmpv_set_option_string(this->mpv_handle, (char*)"vo", (char*)"libmpv");
-                if(dmpv_initialize(this->mpv_handle) < 0){
+                this->_mpv_handle = dmpv_create();
+                dmpv_set_option_string(this->_mpv_handle, (char*)"vo", (char*)"libmpv");
+                if(dmpv_initialize(this->_mpv_handle) < 0){
                     printf("dmpv_initialize failed\n");
                     return;
                 };
@@ -37,27 +37,27 @@ namespace lunaris {
                     {MPV_RENDER_PARAM_ADVANCED_CONTROL, &advanced_control},
                     {MPV_RENDER_PARAM_INVALID, NULL}
                 };
-                dmpv_wakeup(this->mpv_handle);
-                if(dmpv_render_context_create(&this->mpv_context, this->mpv_handle, params) < 0){
+                dmpv_wakeup(this->_mpv_handle);
+                if(dmpv_render_context_create(&this->mpv_context, this->_mpv_handle, params) < 0){
                     printf("dmpv_render_context_create failed\n");
                     return;
                 };
             };
             void load_media(std::string file_name){
-                dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
+                dmpv_set_property_string(this->_mpv_handle, (char*)"pause", (char*)"yes");
                 const char* file[] = {(char*)"loadfile", file_name.c_str(), NULL};
-                dmpv_command_async(this->mpv_handle, 0, file);
+                dmpv_command_async(this->_mpv_handle, 0, file);
             };
             void play(){
-                dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"no");
+                dmpv_set_property_string(this->_mpv_handle, (char*)"pause", (char*)"no");
             };
             void pause(){
-                dmpv_set_property_string(this->mpv_handle, (char*)"pause", (char*)"yes");
+                dmpv_set_property_string(this->_mpv_handle, (char*)"pause", (char*)"yes");
             };
             void set_time_pos(int time_pos){
                 char time_pos_str[12];
                 sprintf(time_pos_str, "%d", time_pos);
-                dmpv_set_property_string(this->mpv_handle, "time-pos", time_pos_str);
+                dmpv_set_property_string(this->_mpv_handle, "time-pos", time_pos_str);
             };
             void draw(lunaris::window* win, uint32_t* buffer){
                 if(this->_win == NULL) this->_win = win;
@@ -79,8 +79,8 @@ namespace lunaris {
 
                 if(this->_event_pooled_timer++%5==0) poll_mpv_events((void*)this);
 
-                dmpv_observe_property(this->mpv_handle, 0, "duration", MPV_FORMAT_DOUBLE);
-                dmpv_observe_property(this->mpv_handle, 0, "time-pos", MPV_FORMAT_DOUBLE);
+                dmpv_observe_property(this->_mpv_handle, 0, "duration", MPV_FORMAT_DOUBLE);
+                dmpv_observe_property(this->_mpv_handle, 0, "time-pos", MPV_FORMAT_DOUBLE);
 
                 for(int render_y=0; render_y<this->fh; render_y++){
                     for(int render_x=0; render_x<this->fw; render_x++){
@@ -98,7 +98,7 @@ namespace lunaris {
 void poll_mpv_events (void* widget_ptr){
     lunaris::ui::video* widget = (lunaris::ui::video*)widget_ptr;
     for(;;){
-        mpv_event* event = dmpv_wait_event(widget->mpv_handle, 0);
+        mpv_event* event = dmpv_wait_event(widget->_mpv_handle, 0);
         if(event->event_id == MPV_EVENT_NONE) break;
 
         if(event->event_id == MPV_EVENT_PROPERTY_CHANGE){
