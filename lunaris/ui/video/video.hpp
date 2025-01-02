@@ -59,16 +59,27 @@ namespace lunaris {
                 sprintf(time_pos_str, "%d", time_pos);
                 dmpv_set_property_string(this->_mpv_handle, "time-pos", time_pos_str);
             };
+            uint32_t* pixels = NULL;
+            uint32_t pixel_count = 0;
             void draw(lunaris::window* win, uint32_t* buffer){
                 if(this->_win == NULL) this->_win = win;
+
                 const int resolution[2] = {this->fw, this->fh};
                 const int pitch = this->fw*4;
-                uint32_t pixels[(this->fw+24)*(this->fh+24)];
+
+                const int new_pixel_count = (this->fw+24)*(this->fh+24);
+                if(pixels == NULL){
+                    pixel_count = new_pixel_count;
+                    pixels = (uint32_t*)malloc(new_pixel_count*sizeof(uint32_t));
+                } else if(pixel_count != new_pixel_count) {
+                    pixels = (uint32_t*)realloc((void*)pixels, new_pixel_count*sizeof(uint32_t));
+                };
+
                 mpv_render_param render_params[] = {
                     {MPV_RENDER_PARAM_SW_SIZE, (void*)resolution},
                     {MPV_RENDER_PARAM_SW_FORMAT, (char*)"bgr0"},
                     {MPV_RENDER_PARAM_SW_STRIDE, (void*)&pitch},
-                    {MPV_RENDER_PARAM_SW_POINTER, &pixels},
+                    {MPV_RENDER_PARAM_SW_POINTER, pixels},
                     {MPV_RENDER_PARAM_INVALID, NULL},
                 };
 
@@ -76,7 +87,6 @@ namespace lunaris {
                     printf("dmpv_render_context_render failed\n");
                     return;
                 };
-
                 if(this->_event_pooled_timer++%5==0) poll_mpv_events((void*)this);
 
                 dmpv_observe_property(this->_mpv_handle, 0, "duration", MPV_FORMAT_DOUBLE);

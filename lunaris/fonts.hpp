@@ -28,7 +28,7 @@ namespace lunaris {
         #elif defined(linux)
             return (char*)"/usr/share/fonts/noto/NotoSans-Regular.ttf";
         #elif defined(__HAIKU__)
-            return (char*)"/Haiku/system/data/fonts/ttfonts/NotoSans-Regular.ttf";
+            return (char*)"/system/data/fonts/ttfonts/NotoSans-Regular.ttf";
         #elif defined(__EMSCRIPTEN__)
             return (char*)"/font.ttf";
         #else

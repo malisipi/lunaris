@@ -45,7 +45,12 @@ void _load_mpv(){
     #ifndef _WIN32
     _libmpv_handle = dlopen("libmpv.so", RTLD_LAZY);
     if (!_libmpv_handle) {
-        printf("libmpv cannot be loaded due to %s\n", dlerror());
+        printf("libmpv cannot be loaded due to %s\nWill looking for libmpv.so.2\n", dlerror());
+        _libmpv_handle = dlopen("libmpv.so.2", RTLD_LAZY);
+        if (!_libmpv_handle) {
+            printf("libmpv cannot be loaded due to %s\n", dlerror());
+            return;
+        };
     };
     #else 
     _libmpv_handle = LoadLibrary("libmpv.dll");

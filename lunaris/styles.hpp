@@ -103,12 +103,15 @@ namespace lunaris {
                     let computed_style = window.getComputedStyle(calculator_element) ;
                     let accent_color = computed_style.getPropertyValue("color").match(/[0-9]+/g).slice(0,3).map(a=>Number(a));
                     calculator_element.remove();
-                    return (accent_color[2]<<16) | (accent_color[1]<<8) | accent_color[0];
+                    return 0xFF000000 | (accent_color[2]<<16) | (accent_color[1]<<8) | accent_color[0];
                 });
                 if(color == 0xFFC64100 /* Chrome */ || color == 0xFFE48434 /* Safari (aka Webkit) */) { // It's browsers default highlight color, so it's not a accent color. It's pre-defined color to reduce fingerprint.
                     return 0x00000000;
                 };
                 return color;
+            #elif defined(__HAIKU__)
+                rgb_color panel_color = ui_color(B_PANEL_BACKGROUND_COLOR);
+                return 0xFF000000 | (panel_color.red<<16) | (panel_color.green<<8) | panel_color.blue;
             #endif
             return 0x00000000;
         };
@@ -143,6 +146,9 @@ namespace lunaris {
 
                 pclose(gsettings_output);
                 return is_light_theme;
+            #elif defined(__HAIKU__)
+                rgb_color bg_color = ui_color(B_PANEL_BACKGROUND_COLOR);
+                return bg_color.red+bg_color.green+bg_color.blue > 550; // 0-765 > 550
             #endif
 
             return true;

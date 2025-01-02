@@ -14,6 +14,9 @@ namespace lunaris {
             bool __is_maximized = false;
             virtual void draw (lunaris::window* win, uint32_t* buffer){
                 int shadow_offset = 0;
+                #ifdef __HAIKU__
+                    this->should_decorated = false;
+                #endif
                 if(this->should_decorated && !this->__is_maximized){
                     shadow_offset = this->shadow_offset;
                 };

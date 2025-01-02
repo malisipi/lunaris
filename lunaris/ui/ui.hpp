@@ -114,8 +114,10 @@ namespace lunaris {
             win->graphics.rect(0, 0, win->width, win->height, win->colors->background_color);
 
             lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
-            layout->__set_f_size(0, 0, win->width, win->height);
-            layout->draw(win, buffer);
+            if(layout != NULL){
+                layout->__set_f_size(0, 0, win->width, win->height);
+                layout->draw(win, buffer);
+            };
 
             /*if(win->focused != NULL) {
                 win->graphics.rect_empty(((lunaris::ui::widget*)win->focused)->fx-1, ((lunaris::ui::widget*)win->focused)->fy-1, ((lunaris::ui::widget*)win->focused)->fw+2, ((lunaris::ui::widget*)win->focused)->fh+2, 2, 0xFFAAAAAA);
@@ -131,7 +133,7 @@ namespace lunaris {
                 #endif
             #endif
             lunaris::ui::layout* layout = (lunaris::ui::layout*)win->layout;
-            layout->mouse_event(win, x, y, pressed, dx, dy, event);
+            if(layout != NULL) layout->mouse_event(win, x, y, pressed, dx, dy, event);
         };
 
         void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){

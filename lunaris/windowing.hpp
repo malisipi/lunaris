@@ -56,11 +56,9 @@
 #include <Application.h>
 #include <Window.h>
 #include <View.h>
-#include <Screen.h>
 #include <Bitmap.h>
 #include <GraphicsDefs.h>
 #include <Message.h>
-#include <string.h>
 #endif
 
 #ifdef emscripten
