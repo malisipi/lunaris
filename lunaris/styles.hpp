@@ -165,5 +165,55 @@ namespace lunaris {
             palette->border_color -= 0x22000000;
             palette->hover_color -= 0x44000000;
         };
+
+        void rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b, float* h, float* s, float* v) {
+            float fr = r / 255.0;
+            float fg = g / 255.0;
+            float fb = b / 255.0;
+            
+            float max = std::max(fr, std::max(fg, fb));
+            float min = std::min(fr, std::min(fg, fb));
+            float delta = max - min;            
+            *v = max;
+
+            if (max == 0) {
+                *s = 0;
+                *h = 0;
+                return;
+            };
+            // else
+            *s = delta / max;
+
+            if (max == fr) {
+                *h = 60.0f * (fg - fb) / delta + (fg < fb ? 360.0f : 0.0f);
+            } else if (max == fg) {
+                *h = 60.0f * (fb - fr) / delta + 120.0f;
+            } else {
+                *h = 60.0f * (fr - fg) / delta + 240.0f;
+            };
+        };
+
+        uint32_t extract_vibrant_color(lunaris::layer* layer) {
+            float max_score = 0.0f;
+            uint32_t vibrant_color = 0x00000000;
+
+            float h, s, v;
+            for (int y = 0; y < layer->height; y++){
+                for (int x = 0; x < layer->width; x++){
+                    uint32_t pixel = layer->data[y * layer->width + x];
+                    rgb_to_hsv(
+                        (pixel >> 16) & 0xFF, (pixel >> 8) & 0xFF, pixel & 0xFF,
+                        &h, &s, &v);
+
+                    float score = s * v;
+
+                    if (score > max_score) {
+                        max_score = score;
+                        vibrant_color = pixel;
+                    };
+                };
+            };
+            return vibrant_color;
+        };
     };
 };
