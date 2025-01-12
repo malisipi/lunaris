@@ -14,7 +14,6 @@ namespace lunaris {
     #define uint_rgb_color_from(red, green, blue) ((((uint32_t)red << (4*4)) & 0x00FF0000) + (((uint32_t)green << (2*4)) & 0x0000FF00) + (((uint32_t)blue << (0*4)) & 0x000000FF))
     #define uint_rgba_color_from(red, green, blue, alpha) ((((uint32_t)red << (4*4)) & 0x00FF0000) + (((uint32_t)green << (2*4)) & 0x0000FF00) + (((uint32_t)blue << (0*4)) & 0x000000FF) + (alpha & 0xFF000000))
 
-
     char* get_system_font(){
         #if defined(_WIN32)
             static char* system_root = getenv((char*)"SystemRoot");
@@ -39,7 +38,7 @@ namespace lunaris {
     unsigned char color_mix_one_color(unsigned char color1, unsigned char color2, float mix_value){
         if(color1-color2 < 0) return color_mix_one_color(color2, color1, 1-mix_value);
         return color1-(color1-color2)*mix_value;
-    }
+    };
 
     uint32_t color_mix(uint32_t color1, uint32_t color2, float mix_value){
         if(mix_value == 0) return color1;
@@ -50,7 +49,31 @@ namespace lunaris {
             color_mix_one_color(uint_color_blue(color1), uint_color_blue(color2), mix_value),
             color_mix_one_color(uint_color_alpha(color1), uint_color_alpha(color2), mix_value)
         );
-    }
+    };
+
+    typedef enum {
+        writing_auto,
+        writing_ltr,
+        writing_rtl
+    } writing_direction;
+
+    writing_direction get_writing_direction(uint32_t the_char) {
+        if ((the_char >= 0x0590 && the_char <= 0x08FF) || // Hebrew, Arabic, Syriac, Arabic Supplement, Thaana, NKo, Samaritan, Mandaic, Syriac Supplement, Arabic Extended-A
+            (the_char >= 0xFB50 && the_char <= 0xFDFF) || // Arabic Presentation Forms-A
+            (the_char >= 0xFE70 && the_char <= 0xFEFF) || // Arabic Presentation Forms-B
+            (the_char >= 0x10C00 && the_char <= 0x10C4F)){ // Old Turkic
+                return writing_rtl;
+        };
+
+        if ((the_char >= 0x0000 && the_char <= 0x007F) || // Latin
+            (the_char >= 0x0100 && the_char <= 0x024F) || // Latin Extended -A/B
+            (the_char >= 0x0370 && the_char <= 0x03FF) || // Greek
+            (the_char >= 0x0400 && the_char <= 0x052F)){ // Cyrillic, Cyrillic Supplement
+                return writing_ltr;
+        };
+
+        return writing_auto;
+    };
 
     typedef struct font {
         unsigned char* font_buffer;
@@ -100,11 +123,26 @@ namespace lunaris {
                 };
             };
 
+            #ifndef LUNARIS_DISABLE_RTL_RENDERING
+                std::vector<uint32_t> rtl_glyphs = {};
+                writing_direction prev_writing_dir = writing_ltr;
+                rtl_glyphs.clear();
+            #endif
+            #ifndef LUNARIS_DISABLE_RTL_RENDERING
+            for (uint64_t i = 0; i < strlen(text) || !rtl_glyphs.empty(); i++){
+            #else
             for (uint64_t i = 0; i < strlen(text); i++){
+            #endif
                 if(i == cursor_pos){
                     draw_cursor();
                 };
-                if(text[i] == '\n'){ // It's multi-line hack shift
+
+                // It's multi-line hack shift
+                #ifndef LUNARIS_DISABLE_RTL_RENDERING
+                if(text[i] == '\n' && rtl_glyphs.empty()){
+                #else
+                if(text[i] == '\n'){
+                #endif
                     pos_x = text_start_x;
                     // pos_x = text_start_x + line_height/3; // For italic
                     pos_y += line_height;
@@ -117,6 +155,25 @@ namespace lunaris {
 
                 uint32_t the_glyph = this->__get_glyph_from_text(&i, text);
                 if(the_glyph == 0) continue;
+                
+                #ifndef LUNARIS_DISABLE_RTL_RENDERING
+                    writing_direction active_dir = get_writing_direction(the_glyph);
+                    if(active_dir == writing_auto) active_dir = prev_writing_dir;
+                    if(active_dir == writing_ltr){
+                        prev_writing_dir = writing_ltr;
+                        if(!rtl_glyphs.empty()){
+                            the_glyph = rtl_glyphs.back();
+                            rtl_glyphs.pop_back();
+                            i--; // Since it's drawing from previous glyphs, the active glyph will not be drawn in this iteration.
+                        };
+                    };
+                    if(active_dir == writing_rtl){
+                        prev_writing_dir = writing_rtl;
+                        rtl_glyphs.push_back(the_glyph);
+                        continue;
+                    };
+                #endif
+
                 if(stbtt_FindGlyphIndex(&info,the_glyph) == 0){
                     if(this->fallback_font != NULL){ // The glyph is not exist on this font, looking to fallback font
                         this->fallback_font->draw_glyph(buffer, buffer_width, buffer_height, pos_x, pos_y, line_height, the_glyph, color);
