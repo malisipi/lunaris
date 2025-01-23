@@ -5,9 +5,10 @@
 * Windows 10 and above<sup>1</sup>
 * Linux/Wayland<sup>2</sup>
 * Linux/Framebuffer
-* Web
+* Web/Emscripten
+* HaikuOS
 
-1. The library can be compiled for Windows XP and above via MinGW G++ 7.5.0 (MSVCRT). However it's not supported. Some parts of the library may not support legacy Windows versions. And in future, it may not compatible with Windows XP due to lack of modern APIs.
+1. The library can be compiled for Windows 2000 and above. However it's not supported. Some parts of the library may not support legacy Windows versions. And in future, it may not compatible with Windows 2000 due to lack of modern APIs.
 2. Legacy versions of Wayland may not be supported.
 
 ## License
