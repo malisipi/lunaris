@@ -520,7 +520,7 @@ namespace lunaris {
 
             case WM_XBUTTONDOWN: {
                 if(win->mouse_handler != NULL){
-                    if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
+                    if((XBUTTON1&(wparam>>16)) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
                         #ifdef LUNARIS_DEBUG
                         printf("#pointer@button x1 %dx%d | press\n", GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
                         #endif
@@ -566,7 +566,7 @@ namespace lunaris {
 
             case WM_XBUTTONUP: {
                 if(win->mouse_handler != NULL){
-                    if(XBUTTON1&(wparam>>16) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
+                    if((XBUTTON1&(wparam>>16)) == XBUTTON1) { // https://learn.microsoft.com/en-us/windows/win32/inputdev/wm-xbuttondown
                         #ifdef LUNARIS_DEBUG
                         printf("#pointer@button x1 %dx%d | release\n", GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
                         #endif

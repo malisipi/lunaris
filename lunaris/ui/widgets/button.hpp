@@ -72,7 +72,6 @@ namespace lunaris {
                 };
             };
             virtual void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
-                const int text_size = this->text.size();
                 if((event == keyboard::pressed || event == keyboard::repeated) && (key == keycode::enter || key == keycode::np_enter || key == keycode::space)){
                     this->mouse_event(win, 0, 0, 1, 0, 0, lunaris::mouse::first);
                 };

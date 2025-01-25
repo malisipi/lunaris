@@ -49,7 +49,6 @@ namespace lunaris {
                 } else {
                     win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
                     if(this->text != ""){
-                        char the_text[this->text.size()+1];
                         win->graphics.text_with_cursor(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->text.c_str(), 0xFF000000, 0, 0xFF000000);
                     } else {
                         win->graphics.text_with_cursor(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), 0xFF444444, 0, 0xFF000000);

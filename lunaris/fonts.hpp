@@ -342,8 +342,6 @@ namespace lunaris {
         };
         uint64_t get_clicking_pos(const int line_height, const char* text, float clicked_xf, float clicked_yf, int skip_lines){
             float scale = stbtt_ScaleForPixelHeight(&this->info, line_height);
-            int text_width = 0;
-            int text_height = line_height;
             int pos_x = 0;
             int pos_y = 0;
             int clicked_x = (int)clicked_xf;
@@ -367,8 +365,6 @@ namespace lunaris {
                     };
                     pos_x = 0;
                     pos_y += line_height;
-
-                    text_height = line_height + pos_y;
                 };
                 if(!is_on_clicked_line) continue;
 

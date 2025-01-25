@@ -419,7 +419,7 @@ namespace lunaris {
 
     const struct xdg_surface_listener xdg_surface_listener = {
         .configure = [](void* data, struct xdg_surface* xdg_surface, uint32_t serial) {
-            lunaris::window* win = (lunaris::window*)data;
+            //lunaris::window* win = (lunaris::window*)data;
             xdg_surface_ack_configure(xdg_surface, serial);
             //draw(win);
         },
