@@ -335,21 +335,17 @@ namespace lunaris {
     };
 
     bool __backend_set_decoration(lunaris::window* win, bool decorated){
-        #ifndef WIN32_ALPHA_SUPPORT
-            LONG lStyle;
-            if(decorated){
-                lStyle = GetWindowLong(win->__hwnd, GWL_STYLE);
-                lStyle |= WS_OVERLAPPEDWINDOW;
-            } else {
-                lStyle = GetWindowLong(win->__hwnd, GWL_STYLE);
-                lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
-            }
-            SetWindowLong(win->__hwnd, GWL_STYLE, lStyle);
-            SetWindowPos(win->__hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-            return true;
-        #else
-            return false;
-        #endif
+        LONG lStyle;
+        if(decorated){
+            lStyle = GetWindowLong(win->__hwnd, GWL_STYLE);
+            lStyle |= WS_OVERLAPPEDWINDOW;
+        } else {
+            lStyle = GetWindowLong(win->__hwnd, GWL_STYLE);
+            lStyle &= ~(WS_CAPTION | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_SYSMENU);
+        }
+        SetWindowLong(win->__hwnd, GWL_STYLE, lStyle);
+        SetWindowPos(win->__hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+        return true;
     };
 
     void __backend_set_fullscreen(lunaris::window* win, bool fullscreen){
