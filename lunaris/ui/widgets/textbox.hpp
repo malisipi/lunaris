@@ -47,11 +47,12 @@ namespace lunaris {
                     this->vscrollbar->__set_f_size(this->fx+this->fw-16, this->fy+0, 16, this->fh);
                     this->vscrollbar->draw(win, buffer);
                 } else {
-                    win->graphics.rect(this->fx, this->fy, this->fw, this->fh, 0xFFFFFFFF);
+                    win->graphics.rounded_rect(this->fx, this->fy, this->fw, this->fh, 5, win->colors->background_color);
+                    win->graphics.rounded_rect_empty(this->fx, this->fy, this->fw, this->fh, 5, 2, win->colors->border_color);
                     if(this->text != ""){
-                        win->graphics.text_with_cursor(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->text.c_str(), 0xFF000000, 0, 0xFF000000);
+                        win->graphics.text_with_cursor(this->fx, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->text.c_str(), win->colors->text_color, this->pos, win->colors->text_color);
                     } else {
-                        win->graphics.text_with_cursor(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), 0xFF444444, 0, 0xFF000000);
+                        win->graphics.text_with_cursor(this->fx+5, this->fy+(this->fh-std::min(this->fh, 20))/2, std::min(this->fh, 20), this->placeholder.c_str(), win->colors->border_color, this->pos, win->colors->text_color);
                     }
                 };
             };
