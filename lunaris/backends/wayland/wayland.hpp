@@ -1,4 +1,5 @@
 #pragma once
+#include <map>
 
 namespace lunaris {
     #include <wayland-client.h>
@@ -222,38 +223,38 @@ namespace lunaris {
     };
 
     void __backend_start_move(lunaris::window* win){
-        xdg_toplevel_move(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial);
+        xdg_toplevel_move(win->__xdg_toplevel, win->__seat, win->__last_serial);
     }
 
     void __backend_set_cursor(lunaris::window* win, lunaris::cursor::cursor cursor){
         if(win->__cursor_shape_manager == NULL) return;
         using namespace cursor;
 
-        if(cursor == arrow) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_DEFAULT);
-        else if(cursor == text) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_TEXT);
-        else if(cursor == wait) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_WAIT);
-        else if(cursor == help) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_HELP);
-        else if(cursor == pointer) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER);
-        else if(cursor == crosshair) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CROSSHAIR);
-        else if(cursor == not_allowed) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NOT_ALLOWED);
-        else if(cursor == resize_ew) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_EW_RESIZE);
-        else if(cursor == resize_ns) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NS_RESIZE);
-        else if(cursor == resize_nwse) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NWSE_RESIZE);
-        else if(cursor == resize_nesw) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NESW_RESIZE);
-        else if(cursor == move) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ALL_SCROLL);
-        else if(cursor == progress) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_PROGRESS);
-        else if(cursor == alias) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ALIAS);
-        else if(cursor == context_menu) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CONTEXT_MENU);
-        else if(cursor == copy) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_COPY);
-        else if(cursor == no_drop) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NO_DROP);
-        else if(cursor == grab) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_GRAB);
-        else if(cursor == grabbing) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_GRABBING);
-        else if(cursor == cell) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CELL);
-        else if(cursor == col_resize) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_COL_RESIZE);
-        else if(cursor == row_resize) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ROW_RESIZE);
-        else if(cursor == vertical_text) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_VERTICAL_TEXT);
-        else if(cursor == zoom_in) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ZOOM_IN);
-        else if(cursor == zoom_out) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__mouse_last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ZOOM_OUT);
+        if(cursor == arrow) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_DEFAULT);
+        else if(cursor == text) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_TEXT);
+        else if(cursor == wait) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_WAIT);
+        else if(cursor == help) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_HELP);
+        else if(cursor == pointer) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER);
+        else if(cursor == crosshair) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CROSSHAIR);
+        else if(cursor == not_allowed) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NOT_ALLOWED);
+        else if(cursor == resize_ew) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_EW_RESIZE);
+        else if(cursor == resize_ns) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NS_RESIZE);
+        else if(cursor == resize_nwse) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NWSE_RESIZE);
+        else if(cursor == resize_nesw) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NESW_RESIZE);
+        else if(cursor == move) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ALL_SCROLL);
+        else if(cursor == progress) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_PROGRESS);
+        else if(cursor == alias) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ALIAS);
+        else if(cursor == context_menu) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CONTEXT_MENU);
+        else if(cursor == copy) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_COPY);
+        else if(cursor == no_drop) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_NO_DROP);
+        else if(cursor == grab) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_GRAB);
+        else if(cursor == grabbing) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_GRABBING);
+        else if(cursor == cell) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_CELL);
+        else if(cursor == col_resize) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_COL_RESIZE);
+        else if(cursor == row_resize) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ROW_RESIZE);
+        else if(cursor == vertical_text) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_VERTICAL_TEXT);
+        else if(cursor == zoom_in) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ZOOM_IN);
+        else if(cursor == zoom_out) wp_cursor_shape_device_v1_set_shape(win->__cursor_shape_device, win->__last_serial, WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_ZOOM_OUT);
     };
 
     const struct wl_pointer_listener pointer_listener = {
@@ -264,7 +265,7 @@ namespace lunaris {
             #endif
             win->__mouse_x = (float)wl_fixed_to_double(surface_x);
             win->__mouse_y = (float)wl_fixed_to_double(surface_y);
-            win->__mouse_last_serial = serial;
+            win->__last_serial = serial;
             win->set_cursor(lunaris::cursor::arrow);
             if(win->mouse_handler != NULL){
                 win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::enter);
@@ -275,7 +276,7 @@ namespace lunaris {
             #ifdef LUNARIS_DEBUG
                 printf("#pointer@left\n");
             #endif
-            win->__mouse_last_serial = serial;
+            win->__last_serial = serial;
             if(win->mouse_handler != NULL){
                 win->mouse_handler(win, win->__mouse_x, win->__mouse_y, 0, 0, 0, mouse::leave);
             };
@@ -297,7 +298,7 @@ namespace lunaris {
                 const char* states[] = {"Released", "Pressed"};
                 printf("#pointer@button %d | %s\n", button, states[(int)(state == WL_POINTER_BUTTON_STATE_PRESSED)]);
             #endif
-            win->__mouse_last_serial = serial;
+            win->__last_serial = serial;
             if(win->mouse_handler != NULL){
                 lunaris::mouse::mouse the_event = mouse::first;
                 if(button == 272) the_event = mouse::first;
@@ -330,8 +331,57 @@ namespace lunaris {
         .axis_relative_direction=[](void* data, struct wl_pointer* pointer, uint32_t axis, uint32_t direction){}
     };
 
+    typedef struct touch_data {
+        bool has_motion;
+        uint32_t start_time;
+        int x;
+        int y;
+    } touch_data;
+    static std::map<uint32_t /* Touch IDs */, touch_data> __touch_info;
+
+    // TODO: Add also touch input support instead of converting touch to mouse inputs
+    const struct wl_touch_listener touch_listener = {
+        .down=[](void* data, struct wl_touch* wl_touch, uint32_t serial, uint32_t time, struct wl_surface* surface, int32_t id, wl_fixed_t x, wl_fixed_t y){
+            lunaris::window* win = (lunaris::window*)data;
+            __touch_info[id].start_time = time;
+            __touch_info[id].has_motion = false;
+            __touch_info[id].x = (int)wl_fixed_to_double(x);
+            __touch_info[id].y = (int)wl_fixed_to_double(y);
+            win->__last_serial = serial;
+        },
+        .up=[](void* data, struct wl_touch* wl_touch, uint32_t serial, uint32_t time, int32_t id){
+            lunaris::window* win = (lunaris::window*)data;
+            win->__last_serial = serial;
+            if(__touch_info[id].has_motion){
+                win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 0, 0, 0, mouse::first);
+            } else {
+                if(time-__touch_info[id].start_time>5000){ // If touch longer than 5000ms, send second (right) click instead of first (left) click
+                    win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 1, 0, 0, mouse::second);
+                    win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 0, 0, 0, mouse::second);
+                } else {
+                    win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 1, 0, 0, mouse::first);
+                    win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 0, 0, 0, mouse::first);
+                };
+            };
+        },
+        .motion=[](void* data, struct wl_touch* wl_touch, uint32_t time, int32_t id, wl_fixed_t x, wl_fixed_t y){
+            lunaris::window* win = (lunaris::window*)data;
+            if(!__touch_info[id].has_motion){
+                win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 1, 0, 0, mouse::first);
+            };
+            __touch_info[id].has_motion = true;
+            __touch_info[id].x = (int)wl_fixed_to_double(x);
+            __touch_info[id].y = (int)wl_fixed_to_double(y);
+            win->mouse_handler(win, __touch_info[id].x, __touch_info[id].y, 0, 0, 0, mouse::motion);
+        },
+        .frame=[](void* data, struct wl_touch* wl_touch){},
+        .cancel=[](void* data, struct wl_touch* wl_touch){},
+        .shape=[](void* data, struct wl_touch* wl_touch, int32_t id, wl_fixed_t major, wl_fixed_t minor){},
+        .orientation=[](void* data, struct wl_touch* wl_touch, int32_t id, wl_fixed_t orientation){},
+    };
+
     struct wl_seat_listener seat_listener = {
-        .capabilities = [](void*  data, struct wl_seat *seat, uint32_t capabilities) {
+        .capabilities = [](void*  data, struct wl_seat* seat, uint32_t capabilities) {
             lunaris::window* win = (lunaris::window*)data;
             if (capabilities & WL_SEAT_CAPABILITY_POINTER) {
                 // Bind the pointer object when available
@@ -341,12 +391,16 @@ namespace lunaris {
                     if(win->__cursor_shape_manager != NULL){
                         win->__cursor_shape_device = wp_cursor_shape_manager_v1_get_pointer(win->__cursor_shape_manager, win->__pointer);
                     };
-                }
-            }
+                };
+            };
             if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
                 win->__keyboard = wl_seat_get_keyboard(seat);
                 wl_keyboard_add_listener(win->__keyboard, &keyboard_listener, win);
-            }
+            };
+            if (capabilities & WL_SEAT_CAPABILITY_TOUCH) {
+                win->__touch = wl_seat_get_touch(seat);
+                wl_touch_add_listener(win->__touch, &touch_listener, win);
+            };
         },
         .name = [](void* data, struct wl_seat *seat, const char *name) {}
     };
@@ -597,7 +651,7 @@ namespace lunaris {
     };
 
     void __backend_show_window_menu(lunaris::window* win, int x, int y){
-        xdg_toplevel_show_window_menu(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial, x, y);
+        xdg_toplevel_show_window_menu(win->__xdg_toplevel, win->__seat, win->__last_serial, x, y);
     };
 
     void __backend_minimize(lunaris::window* win){
@@ -613,7 +667,7 @@ namespace lunaris {
     };
 
     void __backend_start_resize(lunaris::window* win){
-        xdg_toplevel_resize(win->__xdg_toplevel, win->__seat, win->__mouse_last_serial, XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT);
+        xdg_toplevel_resize(win->__xdg_toplevel, win->__seat, win->__last_serial, XDG_TOPLEVEL_RESIZE_EDGE_BOTTOM_RIGHT);
     };
 
     void __backend_set_title(lunaris::window* win, const char* title){

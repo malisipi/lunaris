@@ -491,6 +491,7 @@ namespace lunaris {
         struct wl_seat* __seat = NULL;
         struct wl_pointer* __pointer = NULL;
         struct wl_keyboard* __keyboard = NULL;
+        struct wl_touch* __touch = NULL;
         uint32_t __zxdg_decoration_manager_id = 0;
         struct wp_cursor_shape_manager_v1* __cursor_shape_manager = NULL;
         struct wp_cursor_shape_device_v1* __cursor_shape_device = NULL;
@@ -500,8 +501,7 @@ namespace lunaris {
         bool safe_shutdown = true;
         float __mouse_x = 0;
         float __mouse_y = 0;
-        /* I need to serial to change cursor, thanks Wayland */
-        uint32_t __mouse_last_serial = 0;
+        uint32_t __last_serial = 0;
         /* Since Wayland is not supporting sending key repeat information,
         I need to parse events manually */
         char __last_press_buffer[8] = {0};
