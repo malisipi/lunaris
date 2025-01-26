@@ -31,6 +31,7 @@ namespace lunaris {
                 this->is_hovering = is_hovering;
                 if(!this->is_hovering) this->vscrollbar->set_hovering(false);
             };
+            void(*input_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
             void(*submit_handler)(lunaris::window*, lunaris::ui::widget*) = NULL;
             // Only available at non-multiline textbox.
             // This event will only fired when clicked enter
@@ -77,27 +78,35 @@ namespace lunaris {
                     if(this->pos>=text_size) this->pos = text_size;
                     if(this->pos<0) this->pos = 0;
 
+                    auto trigger_input_handler = [&](){
+                        if(input_handler != NULL) input_handler(win, this);
+                    };
+
                     if(key == keycode::enter || key == keycode::np_enter){
                         if(this->multiline){
                             this->text.insert(this->pos++, "\n");
+                            trigger_input_handler();
                         } else {
                             if(this->submit_handler != NULL){
                                 this->submit_handler(win, this);
                             };
                         };
                     } else if(key == keycode::backspace){
+                        bool is_pos_zero = this->pos == 0;
                         for(;this->pos>0 && (this->text[this->pos-1]&0xC0) == 0x80;) this->text.erase(--this->pos, 1); // Deletes continuous characthers firstly
                         if(this->pos>0) this->text.erase(--this->pos, 1); // Afterly, deletes unicode char
+                        if(!is_pos_zero) trigger_input_handler();
                     } else if(key == keycode::arrow_left){
                         if(this->pos>0) this->pos--;
                         for(;this->pos>0 && (this->text[this->pos]&0xC0) == 0x80;) this->pos--; // Skip continuous characters
                     } else if(key == keycode::arrow_right){
                         if(this->pos<text_size) this->pos++;
                         for(;this->pos<text_size && (this->text[this->pos]&0xC0) == 0x80;) this->pos++; // Skip continuous characters
-                    } else if(new_char != NULL && new_char[0] != '\0'){
+                    } else if(new_char != NULL && new_char[0] != '\0'){ // TODO: Implement Arrow Up/Down, Delete
                         if(event == keyboard::pressed) {
                             this->text.insert(this->pos, new_char);
                             this->pos += strlen(new_char);
+                            trigger_input_handler();
                         };
                     };
                 };

@@ -16,10 +16,10 @@ namespace lunaris {
             void draw(lunaris::window* win, uint32_t* buffer){
                 if(this->horizontal){
                     win->graphics.rounded_rect(this->fx+10, this->fy+this->fh/2-4, this->fw-20, 8, 4, win->colors->seconder_color);
-                    win->graphics.circle(this->fx+10+(this->value-this->min)*this->fw/(this->max-this->min+1), this->fy+this->fh/2, 10, win->colors->hover_color);
+                    win->graphics.circle(this->fx+10+(this->value-this->min)*(this->fw-20)/(this->max-this->min+1), this->fy+this->fh/2, 10, win->colors->hover_color);
                 } else {
                     win->graphics.rounded_rect(this->fx+this->fw/2-4, this->fy+10, 8, this->fh-20, 4, win->colors->seconder_color);
-                    win->graphics.circle(this->fx+this->fw/2, this->fy+10+(this->value-this->min)*this->fh/(this->max-this->min+1), 10, win->colors->hover_color);
+                    win->graphics.circle(this->fx+this->fw/2, this->fy+10+(this->value-this->min)*(this->fh-20)/(this->max-this->min+1), 10, win->colors->hover_color);
                 }
             };
             void(*input_handler)(lunaris::window*, lunaris::ui::widget*, int prev_value) = NULL;
