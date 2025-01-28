@@ -31,7 +31,7 @@ namespace lunaris {
 	void __backend_resize(lunaris::window* win, int w, int h){};
 
 	lunaris::window* new_window(){
-		lunaris::window* win = (lunaris::window*)malloc(sizeof(lunaris::window));
+		lunaris::window* win = new lunaris::window;
 		win->graphics.__init(win);
 		win->is_alive = true;
 		__framebuffer::__mouse::initalize();

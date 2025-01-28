@@ -162,7 +162,7 @@ namespace lunaris {
     BApplication* haiku_app = NULL;
 
     lunaris::window* new_window(void){
-        lunaris::window* win = (lunaris::window*)malloc(sizeof(lunaris::window));
+        lunaris::window* win = new lunaris::window;
         win->graphics.__init(win);
         win->is_alive = true;
 

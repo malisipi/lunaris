@@ -205,10 +205,10 @@ namespace lunaris {
         bool is_alive = false;
         void destroy(void) {
             if(this->is_alive){
+                __backend_destroy(this);
                 if(this->graphics.font != NULL){
                     this->graphics.font->destroy();
                 };
-                __backend_destroy(this);
             };
         };
         void resize(int w, int h){ return __backend_resize(this, w, h); }
