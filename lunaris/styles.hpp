@@ -159,11 +159,11 @@ namespace lunaris {
         };
 
         void make_more_transparent(color_palette* palette){
-            palette->seconder_color -= 0x66000000;
-            palette->other_color -= 0x66000000;
-            palette->background_color -= 0x99000000;
-            palette->border_color -= 0x22000000;
-            palette->hover_color -= 0x44000000;
+            palette->seconder_color -= 0x33000000;
+            palette->other_color -= 0x33000000;
+            palette->background_color -= 0x44000000;
+            palette->border_color -= 0x11000000;
+            palette->hover_color -= 0x22000000;
         };
 
         void rgb_to_hsv(uint8_t r, uint8_t g, uint8_t b, float* h, float* s, float* v) {
