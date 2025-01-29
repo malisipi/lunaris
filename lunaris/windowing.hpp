@@ -36,6 +36,12 @@
 #endif
 
 #ifdef _WIN32
+    #ifndef UNICODE
+        #define UNICODE
+        #define _UNICODE
+        #warning Define UNICODE before importing the library or windows.h
+    #endif
+
     #include <windows.h>
     #include <windowsx.h>
 #endif

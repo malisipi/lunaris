@@ -42,7 +42,7 @@ namespace lunaris {
                     ofn.lpstrInitialDir = NULL;
                     ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-                    if (GetOpenFileNameW(&ofn) && (WideCharToMultiByte(CP_UTF8, 0, file_path_w, -1, file_path, sizeof(file_path), NULL, NULL) > 0)) {
+                    if (GetOpenFileNameW(&ofn) && (WideCharToMultiByte(CP_ACP, 0, file_path_w, -1, file_path, sizeof(file_path), NULL, NULL) > 0)) {
                         return file_path;
                     }; // else
                     return NULL;
@@ -50,39 +50,39 @@ namespace lunaris {
             };
             std::string save_file(){
                 #ifndef _WIN32
-                const char* command = "kdialog --getsavefilename ~"; // TODO: Add support for Zenity
-                char buffer[4096];
-                std::string result = "";
+                    const char* command = "kdialog --getsavefilename ~"; // TODO: Add support for Zenity
+                    char buffer[4096];
+                    std::string result = "";
 
-                FILE* pipe = popen(command, "r");
-                if (!pipe) return NULL;
+                    FILE* pipe = popen(command, "r");
+                    if (!pipe) return NULL;
 
-                while (fgets(buffer, sizeof(buffer), pipe) != NULL) result += buffer;
-                result = result.substr(0, result.size()-1); // Remove "\n" char // TODO: Improve this behavior
+                    while (fgets(buffer, sizeof(buffer), pipe) != NULL) result += buffer;
+                    result = result.substr(0, result.size()-1); // Remove "\n" char // TODO: Improve this behavior
 
-                pclose(pipe);
-                return result;
+                    pclose(pipe);
+                    return result;
                 #else
-                wchar_t file_path_w[4096] = L"";
-                char file_path[4096] = "";
+                    wchar_t file_path_w[4096] = L"";
+                    char file_path[4096] = "";
 
-                OPENFILENAMEW ofn;
-                ZeroMemory(&ofn, sizeof(ofn));
-                ofn.lStructSize = sizeof(ofn);
-                ofn.hwndOwner = NULL;
-                ofn.lpstrFile = file_path_w;
-                ofn.lpstrFile[0] = '\0';
-                ofn.nMaxFile = sizeof(file_path_w);
-                ofn.nFilterIndex = 1;
-                ofn.lpstrFileTitle = NULL;
-                ofn.nMaxFileTitle = 0;
-                ofn.lpstrInitialDir = NULL;
-                ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+                    OPENFILENAMEW ofn;
+                    ZeroMemory(&ofn, sizeof(ofn));
+                    ofn.lStructSize = sizeof(ofn);
+                    ofn.hwndOwner = NULL;
+                    ofn.lpstrFile = file_path_w;
+                    ofn.lpstrFile[0] = '\0';
+                    ofn.nMaxFile = sizeof(file_path_w);
+                    ofn.nFilterIndex = 1;
+                    ofn.lpstrFileTitle = NULL;
+                    ofn.nMaxFileTitle = 0;
+                    ofn.lpstrInitialDir = NULL;
+                    ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
 
-                if (GetSaveFileNameW(&ofn) && (WideCharToMultiByte(CP_UTF8, 0, file_path_w, -1, file_path, sizeof(file_path), NULL, NULL) > 0)) {
-                    return file_path;
-                }; // else
-                return NULL;
+                    if (GetSaveFileNameW(&ofn) && (WideCharToMultiByte(CP_ACP, 0, file_path_w, -1, file_path, sizeof(file_path), NULL, NULL) > 0)) {
+                        return file_path;
+                    }; // else
+                    return NULL;
                 #endif
             };
 
@@ -98,7 +98,11 @@ namespace lunaris {
                     sprintf(command, "kdialog --msgbox \"%s\" --title \"%s\"", text_cleaned, title_cleaned);
                     system(command);
                 #else
-                    MessageBox(NULL, text.c_str(), title.c_str(), MB_OK);
+                    const char* ctext = text.c_str();
+                    const char* ctitle = title.c_str();
+                    __LUNARIS_CHAR_TO_WCHAR(ctext);
+                    __LUNARIS_CHAR_TO_WCHAR(ctitle);
+                    MessageBoxW(NULL, wctext, wctitle, MB_OK);
                 #endif
             };
         };

@@ -3,6 +3,11 @@
 #include <cstdio>
 #include <stdint.h>
 
+#define __LUNARIS_CHAR_TO_WCHAR(the_str) \
+    size_t the_str##_len = strlen(the_str); \
+    wchar_t w##the_str[the_str##_len + 1]; \
+    MultiByteToWideChar(CP_UTF8, 0, the_str, -1, w##the_str, (int)(the_str##_len + 1));
+
 namespace lunaris {
     LRESULT CALLBACK __WindowProc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam);
     HKL keyboard_layout = NULL;
@@ -263,7 +268,7 @@ namespace lunaris {
         win->graphics.__init(win);
         win->is_alive = true;
 
-        const char CLASS_NAME[] = "lunaris_window";
+        const wchar_t CLASS_NAME[] = L"lunaris_window";
 
         WNDCLASS wc = {};
         wc.lpfnWndProc = __WindowProc;
@@ -273,9 +278,9 @@ namespace lunaris {
         RegisterClass(&wc);
 
         #ifndef WIN32_ALPHA_SUPPORT
-            win->__hwnd = CreateWindowEx(0, CLASS_NAME, "<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
+            win->__hwnd = CreateWindowEx(0, CLASS_NAME, L"<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
         #else
-            win->__hwnd = CreateWindowEx(WS_EX_LAYERED, CLASS_NAME, "<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
+            win->__hwnd = CreateWindowEx(WS_EX_LAYERED, CLASS_NAME, L"<Untitled>", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 10, 10, NULL, NULL, NULL, NULL);
         #endif
 
         if (win->__hwnd == NULL) return 0;
@@ -331,7 +336,8 @@ namespace lunaris {
     };
 
     void __backend_set_title(lunaris::window* win, const char* title){
-        SetWindowText(win->__hwnd, title);
+        __LUNARIS_CHAR_TO_WCHAR(title);
+        SetWindowTextW(win->__hwnd, wtitle);
     };
 
     bool __backend_set_decoration(lunaris::window* win, bool decorated){
