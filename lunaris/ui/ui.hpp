@@ -93,7 +93,7 @@ namespace lunaris {
 
         #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
             #warning LUNARIS_UI_DRAW_ON_ONLY_EVENT is an experiment. This may cause applications behave weirdly and may cause crashes.
-            #ifndef _WIN32
+            #ifdef !defined(_WIN32) && !defined(__EMSCRIPTEN__)
                 pthread_mutex_t __draw_lock = PTHREAD_MUTEX_INITIALIZER;
             #else
                 bool __draw_lock = false;
@@ -102,7 +102,7 @@ namespace lunaris {
 
         void draw_handler(lunaris::window* win, uint32_t* buffer){
             #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-                #ifndef _WIN32
+                #ifdef !defined(_WIN32) && !defined(__EMSCRIPTEN__)
                     pthread_mutex_lock(&__draw_lock);
                 #else
                     if(__draw_lock){
@@ -126,7 +126,7 @@ namespace lunaris {
 
         void mouse_handler(lunaris::window* win, float x, float y, bool pressed, float dx, float dy, lunaris::mouse::mouse event){
             #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-                #ifndef _WIN32
+                #ifdef !defined(_WIN32) && !defined(__EMSCRIPTEN__)
                     pthread_mutex_unlock(&__draw_lock);
                 #else
                     __draw_lock = false;
@@ -138,7 +138,7 @@ namespace lunaris {
 
         void keyboard_handler(lunaris::window* win, const char* new_char, lunaris::keycode::keycode key, uint32_t modifiers, lunaris::keyboard::keyboard event){
             #ifdef LUNARIS_UI_DRAW_ON_ONLY_EVENT
-                #ifndef _WIN32
+                #ifdef !defined(_WIN32) && !defined(__EMSCRIPTEN__)
                     pthread_mutex_unlock(&__draw_lock);
                 #else
                     __draw_lock = false;
