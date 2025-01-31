@@ -114,7 +114,7 @@ namespace lunaris {
     };
 #endif
 
-#if defined(__linux__) && defined (ENABLE_EFFECTS) && defined (ENABLE_EXT_BLUR_FOR_PLASMA)
+#if defined(__linux__) && defined (ENABLE_EFFECTS) && defined (ENABLE_EXT_BLUR_FOR_PLASMA) && defined(LUNARIS_BACKEND_WAYLAND)
 #include "extensions/blur_for_plasma/mpl2/blur_for_plasma.hpp"
     namespace lunaris {
         namespace effects {

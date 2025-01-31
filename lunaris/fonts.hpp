@@ -25,6 +25,7 @@ namespace lunaris {
             #endif
             return font_path;
         #elif defined(linux)
+            if(__internal::is_file_exist((char*)"/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf")) return (char*)"/usr/share/fonts/truetype/noto/NotoSans-Regular.ttf";
             return (char*)"/usr/share/fonts/noto/NotoSans-Regular.ttf";
         #elif defined(__HAIKU__)
             return (char*)"/system/data/fonts/ttfonts/NotoSans-Regular.ttf";

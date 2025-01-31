@@ -328,7 +328,9 @@ namespace lunaris {
         .axis_stop=[](void* data, struct wl_pointer* pointer, uint32_t time, uint32_t axis) {},
         .axis_discrete=[](void* data, struct wl_pointer* pointer, uint32_t axis, int32_t discrete) {},
         .axis_value120=[](void* data, struct wl_pointer* pointer, uint32_t axis, int32_t value120){},
+        #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_ENUM
         .axis_relative_direction=[](void* data, struct wl_pointer* pointer, uint32_t axis, uint32_t direction){}
+        #endif
     };
 
     typedef struct touch_data {

@@ -20,5 +20,11 @@ namespace lunaris {
                 RegCloseKey(hKey);
             }
         #endif
+        bool is_file_exist(const char* file_name){
+            FILE* file = fopen(file_name, "r");
+            if(file == NULL) return false;
+            fclose(file);
+            return true;
+        };
     };
 };

@@ -17,21 +17,21 @@
 #include <math.h>
 #include <vector>
 
-#if !(defined(windows) || defined(wayland) || defined(x11) || defined(haiku) || defined(framebuffer) || defined(emscripten))
+#if !(defined(LUNARIS_BACKEND_WINDOWS) || defined(LUNARIS_BACKEND_WAYLAND) || defined(LUNARIS_BACKEND_HAIKU) || defined(LUNARIS_BACKEND_EMSCRIPTEN) || defined(LUNARIS_BACKEND_FRAMEBUFFER))
     #ifdef _WIN32
-    #define windows
+        #define LUNARIS_BACKEND_WINDOWS
     #endif
 
     #ifdef linux
-    #define wayland
+        #define LUNARIS_BACKEND_WAYLAND
     #endif
 
     #ifdef __HAIKU__
-    #define haiku
+        #define LUNARIS_BACKEND_HAIKU
     #endif
 
     #ifdef __EMSCRIPTEN__
-    #define emscripten
+        #define LUNARIS_BACKEND_EMSCRIPTEN
     #endif
 #endif
 
@@ -46,7 +46,7 @@
     #include <windowsx.h>
 #endif
 
-#ifdef x11
+#if LUNARIS_BACKEND_X11
     #include <X11/X.h>
     #include <X11/Xlib.h>
     #include <X11/extensions/XShm.h>
@@ -58,18 +58,18 @@
     #include <sys/ipc.h>
 #endif
 
-#ifdef haiku
-#include <Application.h>
-#include <Window.h>
-#include <View.h>
-#include <Bitmap.h>
-#include <GraphicsDefs.h>
-#include <Message.h>
+#if LUNARIS_BACKEND_HAIKU
+    #include <Application.h>
+    #include <Window.h>
+    #include <View.h>
+    #include <Bitmap.h>
+    #include <GraphicsDefs.h>
+    #include <Message.h>
 #endif
 
-#ifdef emscripten
-#include <emscripten.h>
-#include <emscripten/html5.h>
+#if LUNARIS_BACKEND_EMSCRIPTEN
+    #include <emscripten.h>
+    #include <emscripten/html5.h>
 #endif
 
 #include "internal.hpp"
@@ -477,7 +477,7 @@ namespace lunaris {
                 };
             };
         } graphics;
-    #ifdef wayland
+    #ifdef LUNARIS_BACKEND_WAYLAND
         struct wl_display* __display = NULL;
         struct wl_registry* __registry = NULL;
         struct wl_compositor* __compositor = NULL;
@@ -516,7 +516,7 @@ namespace lunaris {
         /* Wayland gives no API to hide windows, so I need to attach/deattach surface to hide/show window */
         int __hidden = 0;
     #endif
-    #ifdef x11
+    #ifdef LUNARIS_BACKEND_X11
         Display* __display;
         Window __window;
         int __screen;
@@ -534,10 +534,10 @@ namespace lunaris {
         /* To determine key repeates, since Windows doesn't report that */
         uint32_t __last_pressed_key = 0;
     #endif
-    #ifdef haiku
+    #ifdef LUNARIS_BACKEND_HAIKU
         void* __bwindow = NULL;
     #endif
-    #if defined(framebuffer) || defined(emscripten)
+    #if defined(LUNARIS_BACKEND_FRAMEBUFFER) || defined(LUNARIS_BACKEND_EMSCRIPTEN)
         void* __buffer = NULL;
     #endif
     #ifdef LUNARIS_UI
@@ -549,11 +549,11 @@ namespace lunaris {
 
 };
 
-#ifdef wayland
+#ifdef LUNARIS_BACKEND_WAYLAND
 #include "backends/wayland/wayland.hpp"
 #endif
 
-#ifdef x11
+#ifdef LUNARIS_BACKEND_X11
 #include "backends/x11/x11.hpp"
 #endif
 
@@ -561,15 +561,15 @@ namespace lunaris {
 #include "backends/windows/windows.hpp"
 #endif
 
-#ifdef haiku
+#ifdef LUNARIS_BACKEND_HAIKU
 #include "backends/haiku/haiku.hpp"
 #endif
 
-#ifdef framebuffer
+#ifdef LUNARIS_BACKEND_FRAMEBUFFER
 #include "backends/framebuffer/framebuffer.hpp"
 #endif
 
-#ifdef emscripten
+#ifdef LUNARIS_BACKEND_EMSCRIPTEN
 #include "backends/emscripten/emscripten.hpp"
 #endif
 
