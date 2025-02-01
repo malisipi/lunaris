@@ -430,9 +430,21 @@ namespace lunaris {
             } else if (strcmp(interface, xdg_wm_base_interface.name) == 0) {
                 win->__xdg_wm_base = (struct xdg_wm_base*)wl_registry_bind(registry, id, &xdg_wm_base_interface, 1);
             } else if (strcmp(interface, wl_pointer_interface.name) == 0) {
-                win->__pointer = (struct wl_pointer*)wl_registry_bind(registry, id, &wl_pointer_interface, version);
+                #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+                    win->__pointer = (struct wl_pointer*)wl_registry_bind(registry, id, &wl_pointer_interface, WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION);
+                #elif defined(WL_POINTER_AXIS_VALUE120_SINCE_VERSION)
+                    win->__pointer = (struct wl_pointer*)wl_registry_bind(registry, id, &wl_pointer_interface, WL_POINTER_AXIS_VALUE120_SINCE_VERSION);
+                #else
+                    win->__pointer = (struct wl_pointer*)wl_registry_bind(registry, id, &wl_pointer_interface, WL_POINTER_FRAME_SINCE_VERSION);
+                #endif
             } else if (strcmp(interface, wl_seat_interface.name) == 0) {
-                win->__seat = (struct wl_seat*)wl_registry_bind(registry, id, &wl_seat_interface, version);
+                #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
+                    win->__seat = (struct wl_seat*)wl_registry_bind(registry, id, &wl_seat_interface, WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION);
+                #elif defined(WL_POINTER_AXIS_VALUE120_SINCE_VERSION)
+                    win->__seat = (struct wl_seat*)wl_registry_bind(registry, id, &wl_seat_interface, WL_POINTER_AXIS_VALUE120_SINCE_VERSION);
+                #else
+                    win->__seat = (struct wl_seat*)wl_registry_bind(registry, id, &wl_seat_interface, WL_POINTER_FRAME_SINCE_VERSION);
+                #endif
                 wl_seat_add_listener(win->__seat, &seat_listener, win);
             } else if (strcmp(interface, zxdg_decoration_manager_v1_interface.name) == 0) {
                 win->__zxdg_decoration_manager_id = id;
