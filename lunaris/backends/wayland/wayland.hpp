@@ -327,8 +327,10 @@ namespace lunaris {
         .axis_source=[](void* data, struct wl_pointer* pointer, uint32_t axis_source) {},
         .axis_stop=[](void* data, struct wl_pointer* pointer, uint32_t time, uint32_t axis) {},
         .axis_discrete=[](void* data, struct wl_pointer* pointer, uint32_t axis, int32_t discrete) {},
+        #ifdef WL_POINTER_AXIS_VALUE120_SINCE_VERSION
         .axis_value120=[](void* data, struct wl_pointer* pointer, uint32_t axis, int32_t value120){},
-        #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_ENUM
+        #endif
+        #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
         .axis_relative_direction=[](void* data, struct wl_pointer* pointer, uint32_t axis, uint32_t direction){}
         #endif
     };

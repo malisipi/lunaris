@@ -68,6 +68,9 @@ namespace lunaris {
                 char kdeglobals_path[4096];
                 sprintf(kdeglobals_path, "%s/.config/kdeglobals", getenv("HOME"));
                 FILE* kdeglobals = fopen(kdeglobals_path, "r");
+                if(kdeglobals == NULL) { // kdeglobals file cannot be found
+                    return 0x00000000;
+                };
                 char new_line[1024];
                 while(fgets(new_line, sizeof(new_line), kdeglobals)) {
                     std::vector<uint8_t> rgb = {0, 0, 0};
