@@ -2,13 +2,15 @@
 
 namespace lunaris {
     namespace ui {
-        int __how_many_char(const char* text, char schar) {
+        int __how_many_char_with_custom_len(const char* text, char schar, uint64_t text_len) {
             int count = 0;
-            uint64_t text_len = strlen(text);
             for(uint64_t i=0; i<text_len;i++){
                 if(text[i] == schar) count++;
             };
             return count;
+        };
+        int __how_many_char(const char* text, char schar) {
+            return __how_many_char_with_custom_len(text, schar, strlen(text));
         };
 
         const uint32_t textbox_id = request_new_id();
@@ -86,6 +88,10 @@ namespace lunaris {
                         if(this->multiline){
                             this->text.insert(this->pos++, "\n");
                             trigger_input_handler();
+                            int cursor_line_index = __how_many_char_with_custom_len(this->text.c_str(), '\n', this->pos);
+                            if(this->vscrollbar->value + this->vscrollbar->view - 1 < cursor_line_index){
+                                this->vscrollbar->value++;
+                            };
                         } else {
                             if(this->submit_handler != NULL){
                                 this->submit_handler(win, this);
