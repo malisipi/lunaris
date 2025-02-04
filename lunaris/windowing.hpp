@@ -254,6 +254,7 @@ namespace lunaris {
                 };
             }
             void rect(int x, int y, int w, int h, uint32_t color){
+                if(w<=0 || h<=0) return;
                 for(int _y=y;_y<y+h;_y++){
                     this->block(x, _y, w, color);
                 };
@@ -283,6 +284,7 @@ namespace lunaris {
             void line_thick(int x1, int y1, int x2, int y2, int thickness, uint32_t color){
                 const int width = abs(x1-x2);
                 const int height = abs(y1-y2);
+                if(width == 0 && height == 0) return;
 
                 if(width > height){
                     const int xs = std::min(x1, x2);
@@ -309,6 +311,7 @@ namespace lunaris {
                 };
             };
             void rect_empty (int x, int y, int w, int h, int thickness, uint32_t color){
+                if(w<=0 || h<=0) return;
                 int margin = thickness/2;
                 this->line_thick(x-margin, y, x+w-margin+thickness, y, thickness, color);
                 this->line_thick(x, y, x, y+h, thickness, color);
@@ -316,6 +319,7 @@ namespace lunaris {
                 this->line_thick(x-margin, y+h, x+w-margin+thickness, y+h, thickness, color);
             };
             void circle (int x, int y, int r, uint32_t color){
+                if(r<=0) return;
                 for(int sy=0;sy<r;sy++){
                     const int w = (float)r*std::sqrt((float)1-std::pow(((float)(sy)+.5)/(float)(r),2) );
                     /* this->line(x, y-sy, x+w, y-sy, color); // top right part
@@ -329,6 +333,7 @@ namespace lunaris {
                 };
             };
             void circle_empty (int x, int y, int r, int thickness, uint32_t color){
+                if(r<=0) return;
                 int prev_w = r;
                 for(int sy=-1;sy<=r;sy++){
                     const int w = (float)r*std::sqrt((float)1-std::pow(
@@ -346,6 +351,7 @@ namespace lunaris {
                 };
             };
             void __partial_circle(int x, int y, int r, bool left, bool top, uint32_t color){
+                if(r<=0) return;
                 for(int sy=0;sy<r;sy++){
                     const int w = (float)r*std::sqrt((float)1-std::pow(((float)(sy)+.5)/(float)(r),2) )+1;
                     if(left) {
@@ -364,6 +370,7 @@ namespace lunaris {
                 };
             };
             void __partial_circle_outline(int x, int y, int r, bool left, bool top, int thickness, uint32_t color){
+                if(r<=0) return;
                 int prev_w = r;
                 for(int sy=-1;sy<=r;sy++){
                     const int w = (float)r*std::sqrt((float)1-std::pow(
@@ -390,6 +397,9 @@ namespace lunaris {
                 };
             };
             void rounded_rect(int x, int y, int w, int h, int radius, uint32_t color){
+                if(w<=0 || h<=0) return;
+                if(radius>w/2) radius = w/2;
+                if(radius>h/2) radius = h/2;
                 this->rect(x+radius, y, w-radius*2, h, color);
                 this->rect(x, y+radius, radius, h-radius*2, color);
                 this->rect(x+w-radius, y+radius, radius, h-radius*2, color);
@@ -399,6 +409,9 @@ namespace lunaris {
                 this->__partial_circle(x+w-radius, y+h-radius, radius, false, false, color);
             };
             void rounded_rect_empty(int x, int y, int w, int h, int radius, int thickness, uint32_t color){
+                if(w<=0 || h<=0) return;
+                if(radius>w/2) radius = w/2;
+                if(radius>h/2) radius = h/2;
                 this->line_thick(x+radius, y, x+w-radius, y, thickness, color);
                 this->line_thick(x+radius, y+h, x+w-radius, y+h, thickness, color);
                 this->line_thick(x, y+radius, x, y+h-radius, thickness, color);
@@ -457,12 +470,15 @@ namespace lunaris {
                 this->line_thick(list[len-1][0], list[len-1][1], list[0][0], list[0][1], thickness, color);
             };
             void text(int x, int y, int line_height, const char* text, uint32_t color){
+                if(line_height<1) return;
                 this->font->draw_text(outer->buffer, outer->width, outer->height, x, y, line_height, text, color);
             };
             void text_with_cursor(int x, int y, int line_height, const char* text, uint32_t color, uint64_t cursor_pos, uint32_t cursor_color){
+                if(line_height<1) return;
                 this->font->draw_text_with_cursor(outer->buffer, outer->width, outer->height, x, y, line_height, text, color, cursor_pos, cursor_color);
             };
             std::pair<int, int> text_bounding_area(int line_height, const char* text){
+                if(line_height<1) return std::make_pair(0,0);
                 return this->font->bounding_area(line_height, text);
             };
             void image(lunaris::layer* img, int x, int y, int width, int height){ // TODO: Add options to flip image and background transparency (skipping editting for transparent pixels like <127 alpha)

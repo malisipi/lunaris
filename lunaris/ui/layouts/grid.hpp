@@ -7,12 +7,12 @@ namespace lunaris {
             virtual uint32_t get_type(){
                 return grid_id;
             };
-            uint32_t col_count = 1;
-            uint32_t row_count = 1;
-            uint32_t col_gap = 0;
-            uint32_t row_gap = 0;
-            uint32_t col_margin = 0;
-            uint32_t row_margin = 0;
+            int col_count = 1;
+            int row_count = 1;
+            int col_gap = 0;
+            int row_gap = 0;
+            int col_margin = 0;
+            int row_margin = 0;
             // bool auto_place = true; If not place will have a option to set grid parts.
             // TODO: resizable grid is important feature. Implement it later
             template <typename T> void place(T child) {
