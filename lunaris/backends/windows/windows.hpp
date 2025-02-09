@@ -4,9 +4,16 @@
 #include <stdint.h>
 
 #define __LUNARIS_CHAR_TO_WCHAR(the_str) \
-    size_t the_str##_len = strlen(the_str); \
-    wchar_t w##the_str[the_str##_len + 1]; \
-    MultiByteToWideChar(CP_UTF8, 0, the_str, -1, w##the_str, (int)(the_str##_len + 1));
+    int the_str##_len = strlen(the_str); \
+    int w##the_str##_len = MultiByteToWideChar(CP_UTF8, 0, the_str, -1, NULL, 0); \
+    wchar_t w##the_str[w##the_str##_len]; \
+    MultiByteToWideChar(CP_UTF8, 0, the_str, -1, w##the_str, w##the_str##_len);
+
+#define __LUNARIS_WCHAR_TO_CHAR(the_wstr) \
+    int the_wstr##_len = wcslen(the_wstr); \
+    int c##the_wstr##_len = WideCharToMultiByte(CP_ACP, 0, the_wstr, -1, NULL, 0, NULL, NULL); \
+    char c##the_wstr[c##the_wstr##_len]; \
+    WideCharToMultiByte(CP_ACP, 0, the_wstr, -1, c##the_wstr, c##the_wstr##_len, NULL, NULL);
 
 namespace lunaris {
     LRESULT CALLBACK __WindowProc(HWND hwnd, uint32_t msg, WPARAM wparam, LPARAM lparam);
@@ -241,6 +248,46 @@ namespace lunaris {
         #endif
         SetClassLongPtr(win->__hwnd, GCLP_HCURSOR, (LONG_PTR)new_cursor);
         SetCursor(new_cursor);
+    };
+
+    void __backend_set_clipboard(window* win, std::string content){
+        if (!OpenClipboard(NULL)) return;
+        EmptyClipboard();
+        
+        const char* text = content.c_str();
+        __LUNARIS_CHAR_TO_WCHAR(text);
+        HGLOBAL global_mem = GlobalAlloc(GMEM_MOVEABLE, wtext_len*sizeof(wchar_t));
+
+        if (!global_mem) return (void)CloseClipboard(); // If memory couldn't allocated
+
+        memcpy(GlobalLock(global_mem), wtext, wtext_len*sizeof(wchar_t));
+        GlobalUnlock(global_mem);
+        SetClipboardData(CF_UNICODETEXT, global_mem);
+        CloseClipboard();
+    };
+
+    std::string __backend_get_clipboard(window* win){
+        if (!OpenClipboard(NULL)) return "";
+
+        HANDLE data = GetClipboardData(CF_UNICODETEXT);
+        if (data == NULL) {
+            CloseClipboard();
+            return "";
+        };
+
+        wchar_t* wtext = static_cast<wchar_t*>(GlobalLock(data));
+        if (wtext == NULL) {
+            CloseClipboard();
+            return "";
+        };
+
+        __LUNARIS_WCHAR_TO_CHAR(wtext);
+        std::string text = cwtext;
+
+        GlobalUnlock(data);
+        CloseClipboard();
+
+        return text;
     };
 
     void* __frame_triggerer(void* data) {

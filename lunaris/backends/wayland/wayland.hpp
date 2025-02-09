@@ -164,6 +164,95 @@ namespace lunaris {
         return fd;
     };
 
+    static const struct wl_data_source_listener data_source_listener = {
+        .target = [](void* data, wl_data_source* wl_data_source, const char* mime_type){},
+        .send = [](void* data, struct wl_data_source* source, const char* mime_type, int fd) {
+            lunaris::window* win = (lunaris::window*)data;
+            if (strcmp(mime_type, "text/plain") == 0 ||
+                    strcmp(mime_type, "text/plain;charset=utf-8") == 0 ||
+                    strcmp(mime_type, "STRING") == 0 ||
+                    strcmp(mime_type, "UTF8_STRING") == 0 ||
+                    strcmp(mime_type, "TEXT") == 0
+                ) {
+                    const char* clipboard_content = win->__clipboard_content.c_str();
+                    write(fd, clipboard_content, strlen(clipboard_content));
+            } else {
+                #ifdef LUNARIS_DEBUG
+                    printf("#data_source@send: Target not supports the mimetype \"%s\"\n", mime_type);
+                #endif
+            };
+            close(fd);
+        },
+        .cancelled = [](void *data, struct wl_data_source *source) {
+            wl_data_source_destroy(source);
+        },
+        .dnd_drop_performed = [](void* data, wl_data_source* wl_data_source){},
+        .dnd_finished = [](void* data, wl_data_source* wl_data_source){},
+        .action = [](void* data, wl_data_source* wl_data_source, uint32_t dnd_action){}
+    };
+
+    static const struct wl_data_offer_listener data_offer_listener = {
+        .offer = [](void* data, struct wl_data_offer* offer, const char* mime_type) {
+            #ifdef LUNARIS_DEBUG
+                printf("#data_offer@offer: Clipboard supports the mimetype %s\n", mime_type);
+            #endif
+        },
+        .source_actions = [](void* data, wl_data_offer* wl_data_offer, uint32_t source_actions){},
+        .action = [](void* data, wl_data_offer* wl_data_offer, uint32_t dnd_action){}
+    };
+
+    static const struct wl_data_device_listener data_device_listener = {
+        .data_offer = [](void* data, struct wl_data_device* data_device, struct wl_data_offer* offer) {
+            wl_data_offer_add_listener(offer, &data_offer_listener, NULL);
+        },
+        .enter = [](void* data, wl_data_device* wl_data_device, uint32_t serial, wl_surface* surface, wl_fixed_t x, wl_fixed_t y, wl_data_offer* id){},
+        .leave = [](void* data, wl_data_device* wl_data_device){},
+        .motion = [](void* data, wl_data_device* wl_data_device, uint32_t time, wl_fixed_t x, wl_fixed_t y){},
+        .drop = [](void* data, wl_data_device* wl_data_device){},
+        .selection = [](void* data, struct wl_data_device* data_device, struct wl_data_offer* offer) {
+            lunaris::window* win = (lunaris::window*)data;
+            if (offer == NULL) {
+                #ifdef LUNARIS_DEBUG
+                    printf("#data_device@selection: Clipboard is empty\n");
+                #endif
+                return;
+            };
+
+            int fds[2];
+            pipe(fds);
+            wl_data_offer_receive(offer, "text/plain;charset=utf-8", fds[1]);
+            close(fds[1]);
+
+            wl_display_roundtrip(((lunaris::window*)data)->__display); // A basic callback to fix freezes
+
+            win->__clipboard_content = "";
+            while (true) {
+                char buf[1024];
+                ssize_t n = read(fds[0], buf, sizeof(buf));
+                if (n <= 0) break;
+                win->__clipboard_content.append(buf, n);
+            }
+            close(fds[0]);
+            wl_data_offer_destroy(offer);
+        }
+    };
+
+    void __backend_set_clipboard(window* win, std::string content){
+        win->__clipboard_content = content;
+        struct wl_data_source* source = wl_data_device_manager_create_data_source(win->__data_device_manager);
+        wl_data_source_add_listener(source, &data_source_listener, win);
+        wl_data_source_offer(source, "text/plain");
+        wl_data_source_offer(source, "text/plain;charset=utf-8");
+        wl_data_source_offer(source, "STRING");
+        wl_data_source_offer(source, "UTF8_STRING");
+        wl_data_source_offer(source, "TEXT");
+        wl_data_device_set_selection(win->__data_device, source, win->__last_serial);
+    };
+
+    std::string __backend_get_clipboard(window* win){
+        return win->__clipboard_content;
+    }
+
     const struct wl_keyboard_listener keyboard_listener = {
         .keymap = [](void* data, struct wl_keyboard* keyboard, uint32_t format, int fd, uint32_t size) { // Keymap aka keyboard layout
             pthread_mutex_lock(&__xkb_initalize_lock);
@@ -187,6 +276,8 @@ namespace lunaris {
         },
         .key = [](void* data, struct wl_keyboard* keyboard, uint32_t serial, uint32_t time, uint32_t key, uint32_t state) { // Key un/presses
             lunaris::window* win = (lunaris::window*)data;
+            win->__last_serial = serial;
+
             if(win->keyboard_handler != NULL){
                 xkb_keycode_t xkb_keycode = key + 8;
                 xkb_keysym_t sym = xkb_state_key_get_one_sym(__xkb_state, xkb_keycode);
@@ -396,6 +487,8 @@ namespace lunaris {
                         win->__cursor_shape_device = wp_cursor_shape_manager_v1_get_pointer(win->__cursor_shape_manager, win->__pointer);
                     };
                 };
+                win->__data_device = wl_data_device_manager_get_data_device(win->__data_device_manager, seat);
+                wl_data_device_add_listener(win->__data_device, &data_device_listener, win);
             };
             if (capabilities & WL_SEAT_CAPABILITY_KEYBOARD) {
                 win->__keyboard = wl_seat_get_keyboard(seat);
@@ -437,6 +530,8 @@ namespace lunaris {
                 #else
                     win->__pointer = (struct wl_pointer*)wl_registry_bind(registry, id, &wl_pointer_interface, WL_POINTER_FRAME_SINCE_VERSION);
                 #endif
+            } else if (strcmp(interface, wl_data_device_manager_interface.name) == 0) {
+                win->__data_device_manager = (struct wl_data_device_manager*)wl_registry_bind(registry, id, &wl_data_device_manager_interface, 3);
             } else if (strcmp(interface, wl_seat_interface.name) == 0) {
                 #ifdef WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION
                     win->__seat = (struct wl_seat*)wl_registry_bind(registry, id, &wl_seat_interface, WL_POINTER_AXIS_RELATIVE_DIRECTION_SINCE_VERSION);

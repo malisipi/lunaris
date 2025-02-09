@@ -104,4 +104,14 @@ namespace lunaris {
 	void __backend_restore(lunaris::window* win){};
 	void __backend_start_resize(lunaris::window* win){};
 	void __backend_set_title(lunaris::window* win, const char* title){};
+	
+	std::string __clipboard_content = "";
+
+    void __backend_set_clipboard(window* win, std::string content){
+        __clipboard_content = content;
+    };
+
+    std::string __backend_get_clipboard(window* win){
+        return __clipboard_content;
+    };
 }

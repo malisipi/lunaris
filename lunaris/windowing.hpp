@@ -16,6 +16,7 @@
 #include <thread>
 #include <math.h>
 #include <vector>
+#include <string>
 
 #if !(defined(LUNARIS_BACKEND_WINDOWS) || defined(LUNARIS_BACKEND_WAYLAND) || defined(LUNARIS_BACKEND_HAIKU) || defined(LUNARIS_BACKEND_EMSCRIPTEN) || defined(LUNARIS_BACKEND_FRAMEBUFFER))
     #ifdef _WIN32
@@ -206,6 +207,8 @@ namespace lunaris {
     void __backend_restore(lunaris::window*);
     void __backend_start_resize(lunaris::window*);
     void __backend_show_window_menu(lunaris::window*, int, int);
+    void __backend_set_clipboard(lunaris::window*, std::string);
+    std::string __backend_get_clipboard(lunaris::window*);
 
     struct window {
         bool is_alive = false;
@@ -219,6 +222,7 @@ namespace lunaris {
         };
         void resize(int w, int h){ return __backend_resize(this, w, h); }
         void set_title(const char* title){ return __backend_set_title(this, title); }
+        void set_title(std::string title){ return __backend_set_title(this, title.c_str()); }
         void loop(void){ return __backend_loop(this); }
         bool set_decoration(bool decorated){ return __backend_set_decoration(this, decorated); }
         void set_fullscreen(bool fullscreen){ return __backend_set_fullscreen(this, fullscreen); }
@@ -230,6 +234,8 @@ namespace lunaris {
         void maximize(){ return __backend_maximize(this); };
         void restore(){ return __backend_restore(this); };
         void start_resize(){ return __backend_start_resize(this); };
+        std::string get_clipboard() { return __backend_get_clipboard(this); }
+        void set_clipboard(std::string content) { return __backend_set_clipboard(this, content); }
         int width;
         int height;
         void* data; // Area for user data; Not used by library
@@ -519,6 +525,9 @@ namespace lunaris {
         struct wp_cursor_shape_device_v1* __cursor_shape_device = NULL;
         struct zxdg_decoration_manager_v1* __zxdg_decoration_manager = NULL;
         struct zxdg_toplevel_decoration_v1* __zxdg_decoration = NULL;
+        struct wl_data_device_manager* __data_device_manager = NULL;
+        struct wl_data_device* __data_device = NULL;
+        std::string __clipboard_content = "";
         // To safely shutdown // TODO: Replace it with more stable API
         bool safe_shutdown = true;
         float __mouse_x = 0;

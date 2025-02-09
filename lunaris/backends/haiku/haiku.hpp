@@ -247,5 +247,16 @@ namespace lunaris {
     void __backend_start_resize(lunaris::window* win){
         ((LunarisWindow*)win->__bwindow)->the_view->resize_mouse_down = true;
     };
+
+    std::string __clipboard_content = "";
+
+    void __backend_set_clipboard(window* win, std::string content){
+        __clipboard_content = content;
+    };
+
+    std::string __backend_get_clipboard(window* win){
+        return __clipboard_content;
+    };
+
     void __backend_show_window_menu(lunaris::window* win, int rx, int ry){}; // Haiku have not window menu
 };
