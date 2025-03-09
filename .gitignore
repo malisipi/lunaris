@@ -1,8 +1,6 @@
 *.o
 *.exe
 *.out
-# Examples is not ready, most of drafts
-examples
 *.png
 *.dll
 *.so
